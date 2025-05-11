@@ -1,0 +1,350 @@
+
+
+/*
+This is a UI file (.ui.qml) that is intended to be edited in Qt Design Studio only.
+It is supposed to be strictly declarative and only uses a subset of QML. If you edit
+this file manually, you might introduce QML code that is not supported by Qt Design Studio.
+Check out https://doc.qt.io/qtcreator/creator-quick-ui-forms.html for details on .ui.qml files.
+*/
+import QtQuick
+import QtQuick.Controls
+import QtQuick3D
+import QtQuick3D.Effects
+import UntitledProject
+import Quick3DAssets.EUROPALETTE 1.0
+import QtQuick.Timeline 1.0
+import QtQuick.Layouts
+
+Rectangle {
+    id: rectangle
+    width: Constants.width
+    height: Constants.height
+
+    color: Constants.backgroundColor
+
+    View3D {
+        id: view3D
+        anchors.fill: parent
+        anchors.leftMargin: 106
+        anchors.rightMargin: 106
+        anchors.topMargin: 129
+        anchors.bottomMargin: 129
+
+        environment: sceneEnvironment
+
+        SceneEnvironment {
+            id: sceneEnvironment
+            antialiasingMode: SceneEnvironment.MSAA
+            antialiasingQuality: SceneEnvironment.High
+        }
+
+        Node {
+            id: scene
+            DirectionalLight {
+                id: directionalLight
+                x: -514.508
+                y: 322.144
+                brightness: 1.74
+                z: -84.81258
+            }
+
+            PerspectiveCamera {
+                id: sceneCamera
+                z: 350
+            }
+
+            Model {
+                id: cubeModel
+                x: -96.179
+                y: 230.757
+                visible: true
+                eulerRotation.z: -11.16395
+                eulerRotation.y: -31.92219
+                eulerRotation.x: 21.1228
+                materials: defaultMaterialRed
+                source: "#Cube"
+                scale.z: 0.6
+                scale.y: 0.6
+                scale.x: 0.6
+                z: 161.83882
+            }
+
+            Europalette {
+                id: europalette
+                x: 0
+                y: 0
+                scale.z: 2.05
+                scale.y: 2.05
+                scale.x: 2.05
+                eulerRotation.z: -11.16395
+                eulerRotation.y: -31.92219
+                eulerRotation.x: 21.1228
+                z: 0
+            }
+
+            Model {
+                id: cubeModel1
+                x: -12.144
+                y: 178.754
+                visible: true
+                source: "#Cube"
+                scale.z: 0.96
+                materials: defaultMaterialGreen
+                eulerRotation.y: -31.92219
+                eulerRotation.z: -11.16395
+                scale.y: 0.96
+                scale.x: 0.96
+                z: 168.01057
+                eulerRotation.x: 21.1228
+            }
+
+            Model {
+                id: cubeModel2
+                x: 38.662
+                y: 337.076
+                visible: true
+                source: "#Cube"
+                scale.z: 0.6
+                materials: defaultMaterialBlue
+                eulerRotation.y: -31.92219
+                eulerRotation.z: -11.16395
+                scale.y: 0.6
+                scale.x: 0.6
+                z: 174.11346
+                eulerRotation.x: 21.1228
+            }
+
+            SequentialAnimation {
+                id: sequentialAnimation
+                paused: false
+                running: false
+            }
+        }
+    }
+
+    Item {
+        id: __materialLibraryRed__
+    }
+
+    Item {
+        id: __materialLibraryGreen__
+    }
+
+    Item {
+        id: __materialLibraryBlue__
+    }
+
+    Text {
+        width: 299
+        height: 45
+        text: qsTr("Preview Pallet Sesion #231")
+        anchors.top: parent.top
+        font.pointSize: 17
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.topMargin: 84
+        font.family: Constants.font.family
+    }
+
+    Switch {
+        id: autoModeToggle
+        x: 106
+        y: 77
+        height: 40
+        text: qsTr("Toggle Auto Mode")
+        font.pointSize: 15
+    }
+
+    StateGroup {
+        id: stateGroup
+    }
+
+    StateGroup {
+        id: stateGroup1
+    }
+
+    Timeline {
+        id: timeline
+        animations: [
+            TimelineAnimation {
+                id: timelineAnimation
+                running: true
+                duration: 1000
+                loops: 1
+                to: 1000
+                from: 0
+            }
+        ]
+        startFrame: 0
+        enabled: true
+        endFrame: 1000
+
+        KeyframeGroup {
+            target: cubeModel1
+            property: "x"
+            Keyframe {
+                value: -8.64845
+                frame: 325
+            }
+        }
+
+        KeyframeGroup {
+            target: cubeModel1
+            property: "y"
+            Keyframe {
+                value: 37.27345
+                frame: 325
+            }
+        }
+
+        KeyframeGroup {
+            target: cubeModel1
+            property: "z"
+            Keyframe {
+                value: 105.79164
+                frame: 325
+            }
+        }
+
+        KeyframeGroup {
+            target: cubeModel
+            property: "x"
+            Keyframe {
+                value: -91.25542
+                frame: 700
+            }
+        }
+
+        KeyframeGroup {
+            target: cubeModel
+            property: "y"
+            Keyframe {
+                value: 31.4765
+                frame: 700
+            }
+        }
+
+        KeyframeGroup {
+            target: cubeModel
+            property: "z"
+            Keyframe {
+                value: 74.20132
+                frame: 700
+            }
+        }
+
+        KeyframeGroup {
+            target: cubeModel2
+            property: "x"
+            Keyframe {
+                value: 45.67536
+                frame: 1000
+            }
+        }
+
+        KeyframeGroup {
+            target: cubeModel2
+            property: "y"
+            Keyframe {
+                value: 53.17792
+                frame: 1000
+            }
+        }
+
+        KeyframeGroup {
+            target: cubeModel2
+            property: "z"
+            Keyframe {
+                value: 49.26385
+                frame: 1000
+            }
+        }
+    }
+
+    Item {
+        id: __materialLibrary__
+
+        PrincipledMaterial {
+            id: defaultMaterialRed
+            objectName: "Default Material Red"
+            baseColor: "#eb4034"
+        }
+
+        PrincipledMaterial {
+            id: defaultMaterialGreen
+            objectName: "Default Material Green"
+            baseColor: "#34eb6b"
+        }
+
+        PrincipledMaterial {
+            id: defaultMaterialBlue
+            objectName: "Default Material Blue"
+            baseColor: "#4728e0"
+        }
+    }
+
+    RowLayout {
+        id: sliderLayout
+        x: 106
+        y: 957
+        Layout.fillWidth: true
+        height: 40
+        spacing: 5
+
+        RangeSlider {
+            id: rangeSlider
+            height: 40
+            wheelEnabled: false
+            first.value: 0.25
+            second.value: 0.75
+        }
+
+        Text {
+            id: rangeSlicerText
+            text: qsTr("View Slicer")
+            anchors.verticalCenter: parent.verticalCenter
+            font.pixelSize: 17
+            topPadding: 0
+        }
+    }
+
+    RowLayout {
+        id: buttonLayout
+        x: 862
+        y: 957
+        Layout.fillWidth: true
+        spacing: 5
+        height: 40
+
+        Button {
+            id: prevStepButton
+            width: 40
+            height: 40
+            icon.source: "/home/tsogp/schul/2025/sem1/capstone/gui/UntitledProject/assets/angle-double-left-24.png"
+            display: AbstractButton.IconOnly
+        }
+
+        Button {
+            id: pauseButton
+            width: 40
+            height: 40
+            icon.source: "../assets/pause-24.png"
+            display: AbstractButton.IconOnly
+        }
+
+        Button {
+            id: nextStepButton
+            width: 40
+            height: 40
+            icon.source: "../assets/angle-double-right-24.png"
+            display: AbstractButton.IconOnly
+        }
+    }
+}
+
+/*##^##
+Designer {
+    D{i:0;matPrevEnvDoc:"SkyBox";matPrevEnvValueDoc:"preview_studio";matPrevModelDoc:"#Sphere"}
+D{i:3;cameraSpeed3d:25;cameraSpeed3dMultiplier:1}
+}
+##^##*/
+

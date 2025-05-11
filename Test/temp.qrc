@@ -1,0 +1,13 @@
+
+<RCC>
+<qresource>
+<file>qtquickcontrols2.conf</file>
+<file>Test.qmlproject</file>
+<file>Test/Constants.qml</file>
+<file>Test/EventListModel.qml</file>
+<file>Test/EventListSimulator.qml</file>
+<file>Test/qmldir</file>
+<file>TestContent/App.qml</file>
+<file>TestContent/Screen01.ui.qml</file>
+</qresource>
+</RCC>
