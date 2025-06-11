@@ -3,7 +3,9 @@ project(FullScreen3DView VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_PREFIX_PATH "C:/Qt/6.9.0/mingw_64/lib/cmake")
+if(WIN32)
+    set(CMAKE_PREFIX_PATH "C:/Qt/6.9.0/mingw_64/lib/cmake")
+endif()
 
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Quick Quick3D)
 
@@ -20,6 +22,7 @@ qt_add_qml_module(appFullScreen3DView
     VERSION 1.0
     QML_FILES
         qml/Main.qml
+        # qml/Mainscreen.qml
     RESOURCES
         ${ASSET_FILES}
     RESOURCE_PREFIX /
@@ -28,7 +31,7 @@ qt_add_qml_module(appFullScreen3DView
 
 set_target_properties(appFullScreen3DView PROPERTIES
     MACOSX_BUNDLE TRUE
-    WIN32_EXECUTABLE TRUE
+    # WIN32_EXECUTABLE TRUE
 )
 
 target_link_libraries(appFullScreen3DView PRIVATE
