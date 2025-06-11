@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
         &app,
         []() { QCoreApplication::exit(-1); },
         Qt::QueuedConnection);
-    engine.loadFromModule("FullScreen3DView", "Main");
+    engine.loadFromModule("FullScreen3DView", "Mainscreen");
 
     return app.exec();
 }
