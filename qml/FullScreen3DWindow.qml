@@ -12,8 +12,9 @@ Window {
     width: 1280
     height: 720
     visible: true
-    title: "3D View"
+    title: window.receivedText 
 
+    property string receivedText: ""
     property string currentModelSource: "qrc:/FullScreen3DView/assets/models/eur/EuroPallet.qml"
 
     View3D {
@@ -64,7 +65,7 @@ Window {
 
         Text {
             id: previewText
-            text: qsTr("Preview Session #321")
+            text: window.receivedText ? window.receivedText : qsTr("Preview Session #321")
             font.pixelSize: 17
             horizontalAlignment: Text.AlignHCenter
             anchors.horizontalCenter: parent.horizontalCenter

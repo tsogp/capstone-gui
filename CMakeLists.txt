@@ -13,6 +13,8 @@ qt_standard_project_setup(REQUIRES 6.8)
 
 qt_add_executable(appFullScreen3DView
     src/main.cpp
+    src/fullscreen3dwindow.cpp
+    src/mainwindow.cpp
 )
 
 file(GLOB_RECURSE ASSET_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} CONFIGURE_DEPENDS assets/*)
@@ -21,7 +23,7 @@ qt_add_qml_module(appFullScreen3DView
     URI FullScreen3DView
     VERSION 1.0
     QML_FILES
-        qml/Main.qml
+        qml/FullScreen3DWindow.qml
         qml/Mainscreen.qml
     RESOURCES
         ${ASSET_FILES}

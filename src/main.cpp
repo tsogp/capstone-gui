@@ -1,3 +1,5 @@
+#include "mainwindow.h"
+
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QDirIterator>
@@ -11,20 +13,15 @@ void printResources() {
     }
 }
 
+#include <QGuiApplication>
 
 int main(int argc, char *argv[]) {
     QGuiApplication app(argc, argv);
 
     printResources();
 
-    QQmlApplicationEngine engine;
-    QObject::connect(
-        &engine,
-        &QQmlApplicationEngine::objectCreationFailed,
-        &app,
-        []() { QCoreApplication::exit(-1); },
-        Qt::QueuedConnection);
-    engine.loadFromModule("FullScreen3DView", "Mainscreen");
+    MainWindow mainWindow;
+    mainWindow.loadMainQml();
 
     return app.exec();
 }

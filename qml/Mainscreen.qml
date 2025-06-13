@@ -62,6 +62,8 @@ Window {
                             icon.source: "qrc:/FullScreen3DView/assets/fullscreen-512.png"
                             display: AbstractButton.IconOnly
                             Layout.alignment: Qt.AlignVCenter
+                            // TODO: replace with actual value
+                            onClicked: mainWindow.openFullScreen3DWindow("Preview session #321")
                         }
                     }
 
