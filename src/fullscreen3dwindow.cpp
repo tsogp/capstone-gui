@@ -2,7 +2,7 @@
 #include <QQmlComponent>
 
 #define FULLSCREEN3DWINDOW_URL "qrc:/FullScreen3DView/qml/FullScreen3DWindow.qml"
-#define DEBUG_PREFIX "[FullScreen3DWindow]: "
+#define DEBUG_PREFIX "[FullScreen3DWindow]:"
 
 FullScreen3DWindow::FullScreen3DWindow(QQmlEngine* engine, QObject* parent)
     : QObject(parent), m_engine(engine) {}

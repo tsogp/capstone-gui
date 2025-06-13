@@ -6,7 +6,7 @@
 #include <QDebug>
 
 #define MAINWINDOW_URL "qrc:/FullScreen3DView/qml/Mainscreen.qml"
-#define DEBUG_PREFIX "[MainWindow]: "
+#define DEBUG_PREFIX "[MainWindow]:"
 
 MainWindow::MainWindow() {
     m_secondWindow = new FullScreen3DWindow(this);
