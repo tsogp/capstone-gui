@@ -7,7 +7,7 @@ if(WIN32)
     set(CMAKE_PREFIX_PATH "C:/Qt/6.9.0/mingw_64/lib/cmake") # Adjust this path to your Qt installation
 endif()
 
-find_package(Qt6 REQUIRED COMPONENTS Core Gui Quick Quick3D)
+find_package(Qt6 REQUIRED COMPONENTS Core Gui Quick Quick3D Test)
 
 qt_standard_project_setup(REQUIRES 6.8)
 
@@ -41,6 +41,7 @@ target_link_libraries(appFullScreen3DView PRIVATE
     Qt6::Gui
     Qt6::Quick
     Qt6::Quick3D
+    Qt6::Test
 )
 
 include(GNUInstallDirs)
@@ -49,3 +50,6 @@ install(TARGETS appFullScreen3DView
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
+
+enable_testing()
+add_subdirectory(tests)
