@@ -1,7 +1,9 @@
+#include <QDebug>
+#include <QDirIterator>
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
-#include <QDirIterator>
-#include <QDebug>
+#include <QtLogging>
+
 
 void printResources() {
     qDebug() << "Available resources under :/FullScreen3DView:";

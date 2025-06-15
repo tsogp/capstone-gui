@@ -1,15 +1,21 @@
-import QtQuick 6.5
-import QtQuick.Controls 6.5
+import QtQuick
+import QtQuick.Window
 import QtQuick.Layouts
+import QtQuick.Controls
 
-// Preview: "C:\Qt\6.9.0\mingw_64\bin\qmlscene.exe" then select the Main.qml file
+import QtQuick3D
+import QtQuick3D.Helpers
+import QtQuick3D.AssetUtils
+
 
 Window {
-    id: root
+    id: mainscreen
+    width: 1280
+    height: 720
     visible: true
-    width: 1920
-    height: 1080
-    title: qsTr("Qt Design Studio Loader Example")
+    title: qsTr("Load file")
+
+    property string currentModelSource: "qrc:/FullScreen3DView/assets/models/eur/EuroPallet.qml"
 
     Rectangle {
         id: mainScreen
@@ -38,13 +44,7 @@ Window {
                     RowLayout {
                         id: rowControlPanel
                         Layout.preferredWidth: parent.width
-                        Layout.preferredHeight: parent.height
                         spacing: 0
-
-                        Switch {
-                            id: btToggleAuto
-                            text: qsTr("Toggle Auto Mode")
-                        }
 
                         Item {
                             Layout.fillWidth: true
@@ -52,25 +52,60 @@ Window {
 
                         Button {
                             id: btFullscreen
-                            Layout.preferredHeight: 57
                             text: qsTr("Fullscreen")
-                            font.pixelSize: 22
                             padding: 0
                             Layout.fillWidth: false
-                            icon.height: 22
-                            icon.width: 22
-                            icon.source: "qrc:/FullScreen3DView/assets/fullscreen-512.png"
+                            icon.height: 24
+                            icon.width: 24
+                            icon.source: "qrc:/FullScreen3DView/assets/fullscreen-24.png"
                             display: AbstractButton.IconOnly
                             Layout.alignment: Qt.AlignVCenter
                         }
                     }
 
-                    Image {
-                        id: visual1056697
-                        Layout.preferredWidth: parent.width
-                        source: "images/visual-1056-697.jpg"
-                        sourceSize.width: parent.width
-                        fillMode: Image.PreserveAspectCrop
+                    Item {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+
+                        View3D {
+                            id: view
+                            anchors.fill: parent
+
+                            environment: SceneEnvironment {
+                                id: sceneEnvironment
+                                clearColor: "white"
+                                backgroundMode: SceneEnvironment.Color
+                                antialiasingMode: SceneEnvironment.MSAA
+                                antialiasingQuality: SceneEnvironment.High
+                            }
+
+                            PerspectiveCamera {
+                                id: camera
+                                position: Qt.vector3d(0, 10, 300)
+                                clipNear: 1.0
+                            }
+
+                            DirectionalLight {
+                                position: Qt.vector3d(0, 430, 900)
+                                brightness: 1
+                                eulerRotation.z: -19.212
+                                eulerRotation.x: -25.34759
+                                eulerRotation.y: -2.67751
+                                ambientColor: Qt.rgba(0.5, 0.5, 0.5, 1.0)
+                            }
+
+                            Loader3D {
+                                id: palletLoader
+                                source: currentModelSource
+                                active: true
+
+                                onLoaded: {
+                                    item.position = Qt.vector3d(0, 30, 0)
+                                    item.eulerRotation = Qt.vector3d(15, 70, 30)
+                                    item.scale = Qt.vector3d(1.5, 1.5, 1.5)
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -101,8 +136,7 @@ Window {
                         id: txtaInfo
                         color: "#000000"
                         text: "Currently placing {box.name}\n\nPlacement data:\n- x = {box.x}\n- y = {box.y}\n- z = {box.z}\n- Weight = {box.weight}\n- Max load capacity: {box.max_load_capacity}\n- Estimated load: {box.estiomated_load}"
-                        font.pixelSize: 20
-                        font.family: "Tahoma"
+                        font.pixelSize: 16
                         visible: false
                     }
 
@@ -114,36 +148,34 @@ Window {
                         Text {
                             id: txtChoose
                             text: qsTr("Choose the pallet")
-                            font.pixelSize: 30
-                            font.family: "Tahoma"
+                            font.pixelSize: 16
+                            
                         }
 
                         ComboBox {
                             id: cbPallet
                             Layout.preferredWidth: parent.width
-                            Layout.preferredHeight: 60
+                            Layout.preferredHeight: 30
                             editable: false
                             model: ListModel {
                                 ListElement { text: "EUR" }
                                 ListElement { text: "Industrial" }
                                 ListElement { text: "Asia" }
                             }
-                            font.pixelSize: 24
-                            font.family: "Tahoma"
+                            font.pixelSize: 16
                             Layout.fillWidth: true
                         }
 
                         RowLayout {
                             id: rowPackageList
-                            Layout.preferredHeight: 100
                             Layout.fillWidth: true
                             spacing: 0
 
                             Text {
                                 id: txtPackage
                                 text: qsTr("Load the package list")
-                                font.pixelSize: 30
-                                font.family: "Tahoma"
+                                font.pixelSize: 16
+                                
                             }
 
                             Item {
@@ -151,13 +183,11 @@ Window {
                                 Layout.preferredHeight: 10
                             }
 
-                            RoundButton {
+                            Button {
                                 id: roundButton
-                                Layout.preferredWidth: 50
-                                Layout.preferredHeight: 50
-                                icon.height: 30
-                                icon.width: 30
-                                icon.source: "qrc:/FullScreen3DView/assets/info-512.png"
+                                icon.height: 24
+                                icon.width: 24
+                                icon.source: "qrc:/FullScreen3DView/assets/info-24.png"
                                 icon.color: "#006dd9"
                                 display: AbstractButton.IconOnly
                             }
@@ -168,12 +198,8 @@ Window {
                             objectName: "btBrowseFiles"
                             Layout.fillWidth: true
                             text: qsTr("Browse")
-                            font.pixelSize: 24
-                            icon.source: "qrc:/FullScreen3DView/assets/folder-512.png"
-                            font.family: "Tahoma"
-                            onClicked: {
-                                root.state = "FileLoaded"
-                            }
+                            font.pixelSize: 16
+                            icon.source: "qrc:/FullScreen3DView/assets/folder-24.png"
                         }
                     }
 
@@ -189,52 +215,7 @@ Window {
                         visible: false
 
                         Item {
-                            id: itControlPanel
-                            Layout.preferredHeight: 70
                             Layout.fillWidth: true
-
-                            RowLayout {
-                                id: rowLayout2
-                                Layout.fillWidth: true
-                                spacing: 5
-                                height: parent.height
-
-                                Button {
-                                    id: prevStepButton
-                                    Layout.preferredWidth: 40
-                                    Layout.preferredHeight: 40
-                                    icon.source: "qrc:/FullScreen3DView/assets/angle-double-left-24.png"
-                                    display: AbstractButton.IconOnly
-                                    visible: false
-                                }
-
-                                Button {
-                                    id: restartButton
-                                    Layout.preferredWidth: 40
-                                    Layout.preferredHeight: 40
-                                    icon.source: "qrc:/FullScreen3DView/assets/reload.png"
-                                    display: AbstractButton.IconOnly
-                                    visible: false
-                                }
-
-                                Button {
-                                    id: pauseButton
-                                    Layout.preferredWidth: 40
-                                    Layout.preferredHeight: 40
-                                    icon.source: "qrc:/FullScreen3DView/assets/pause-24.png"
-                                    display: AbstractButton.IconOnly
-                                    visible: false
-                                }
-
-                                Button {
-                                    id: nextStepButton
-                                    Layout.preferredWidth: 40
-                                    Layout.preferredHeight: 40
-                                    icon.source: "qrc:/FullScreen3DView/assets/angle-double-right-24.png"
-                                    display: AbstractButton.IconOnly
-                                    visible: false
-                                }
-                            }
                         }
 
                         Button {
@@ -242,43 +223,11 @@ Window {
                             Layout.preferredWidth: 200
                             Layout.preferredHeight: 40
                             text: qsTr("Start simulation")
-                            font.pixelSize: 26
-                            font.family: "Tahoma"
+                            font.pixelSize: 16
                         }
                     }
                 }
             }
         }
-
-        StateGroup {
-            id: stateGroup
-        }
-
-        states: [
-            State {
-                name: "FileLoaded"
-                PropertyChanges { target: rowButtons.visible = true}
-            },
-            State {
-                name: "Simulation"
-                PropertyChanges { target: choicesColLayout.visible = false }
-                PropertyChanges { target: txtaInfo.visible = true }
-                PropertyChanges { target: rowButtons.visible = true }
-                PropertyChanges { target: prevStepButton.visible = true }
-                PropertyChanges { target: pauseButton.visible = true }
-                PropertyChanges { target: nextStepButton.visible = true }
-            },
-            State {
-                name: "EndSimulation"
-                PropertyChanges { target: choicesColLayout.visible = false }
-                PropertyChanges { target: txtaInfo.visible = true }
-                PropertyChanges { target: rowButtons.visible = true }
-                PropertyChanges { target: prevStepButton.visible = true }
-                PropertyChanges { target: restartButton.visible = true }
-                PropertyChanges { target: pauseButton.visible = false }
-                PropertyChanges { target: nextStepButton.visible = false }
-                PropertyChanges { target: btStartSimulation.text = qsTr("Finish simulation") }
-            }
-        ]
     }
 }

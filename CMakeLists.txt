@@ -4,7 +4,7 @@ project(FullScreen3DView VERSION 0.1 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 if(WIN32)
-    set(CMAKE_PREFIX_PATH "C:/Qt/6.9.0/mingw_64/lib/cmake")
+    set(CMAKE_PREFIX_PATH "C:/Qt/6.9.0/mingw_64/lib/cmake") # Adjust this path to your Qt installation
 endif()
 
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Quick Quick3D)
@@ -22,7 +22,7 @@ qt_add_qml_module(appFullScreen3DView
     VERSION 1.0
     QML_FILES
         qml/Main.qml
-        # qml/Mainscreen.qml
+        qml/Mainscreen.qml
     RESOURCES
         ${ASSET_FILES}
     RESOURCE_PREFIX /
