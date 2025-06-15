@@ -41,30 +41,6 @@ Window {
                     spacing: 0
                     Layout.alignment: Qt.AlignCenter
 
-                    RowLayout {
-                        id: rowControlPanel
-                        Layout.preferredWidth: parent.width
-                        spacing: 0
-
-                        Item {
-                            Layout.fillWidth: true
-                        }
-
-                        Button {
-                            id: btFullscreen
-                            text: qsTr("Fullscreen")
-                            padding: 0
-                            Layout.fillWidth: false
-                            icon.height: 24
-                            icon.width: 24
-                            icon.source: "qrc:/FullScreen3DView/assets/fullscreen-24.png"
-                            display: AbstractButton.IconOnly
-                            Layout.alignment: Qt.AlignVCenter
-                            // TODO: replace with actual value
-                            onClicked: mainWindow.openFullScreen3DWindow("Preview session #321")
-                        }
-                    }
-
                     Item {
                         id: halfScreen3DSpace
                         Layout.fillWidth: true
@@ -123,6 +99,8 @@ Window {
                             icon.source: "qrc:/FullScreen3DView/assets/fullscreen-24.png"
                             display: AbstractButton.IconOnly
                             Layout.alignment: Qt.AlignVCenter
+                            // TODO: replace with actual value
+                            onClicked: mainWindow.openFullScreen3DWindow("Preview session #321")
                         }
                     }
                 }
