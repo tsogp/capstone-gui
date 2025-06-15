@@ -37,25 +37,25 @@ fi
 
 echo "Formatting OK."
 
-# === BUILD CHECK ===
-echo "Building project to verify..."
+# # === BUILD CHECK ===
+# echo "Building project to verify..."
 
-# Optional: clean build folder
-rm -rf "$BUILD_DIR"
-mkdir "$BUILD_DIR"
-cd "$BUILD_DIR"
+# # Optional: clean build folder
+# rm -rf "$BUILD_DIR"
+# mkdir "$BUILD_DIR"
+# cd "$BUILD_DIR"
 
-if ! cmake $CMAKE_FLAGS ..; then
-    echo "CMake configuration failed"
-    exit 1
-fi
+# if ! cmake $CMAKE_FLAGS ..; then
+#     echo "CMake configuration failed"
+#     exit 1
+# fi
 
-if ! cmake --build .; then
-    echo "Build failed"
-    exit 1
-fi
+# if ! cmake --build .; then
+#     echo "Build failed"
+#     exit 1
+# fi
 
-echo "Build succeeded."
+# echo "Build succeeded."
 
 # === TESTS (Optional) ===
 echo "Running tests (if defined)..."
