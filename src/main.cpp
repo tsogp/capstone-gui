@@ -6,22 +6,22 @@
 #include <QQmlApplicationEngine>
 
 void printResources() {
-  qDebug() << "Available resources under :/FullScreen3DView:";
-  QDirIterator it(":/FullScreen3DView", QDirIterator::Subdirectories);
-  while (it.hasNext()) {
-    qDebug() << it.next();
-  }
+    qDebug() << "Available resources under :/FullScreen3DView:";
+    QDirIterator it(":/FullScreen3DView", QDirIterator::Subdirectories);
+    while (it.hasNext()) {
+        qDebug() << it.next();
+    }
 }
 
 #include <QGuiApplication>
 
 int main(int argc, char *argv[]) {
-  QGuiApplication app(argc, argv);
+    QGuiApplication app(argc, argv);
 
-  printResources();
+    printResources();
 
-  MainWindow mainWindow;
-  mainWindow.loadMainQml();
+    MainWindow mainWindow;
+    mainWindow.loadMainQml();
 
-  return app.exec();
+    return app.exec();
 }
