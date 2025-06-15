@@ -2,6 +2,8 @@ add_executable(tests
     testassetsload.cpp
 )
 
+find_package(Qt6 REQUIRED COMPONENTS Core Test)
+
 file(GLOB_RECURSE ASSET_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} CONFIGURE_DEPENDS assets/*)
 qt_add_qml_module(tests
     URI FullScreen3DView
