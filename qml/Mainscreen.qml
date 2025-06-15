@@ -35,35 +35,14 @@ Window {
 
                 ColumnLayout {
                     id: colLeftPanel
-                    width: parent.width - 80
-                    height: parent.height - 80
+                    width: parent.width
+                    height: parent.height
                     anchors.centerIn: parent
                     spacing: 0
                     Layout.alignment: Qt.AlignCenter
 
-                    RowLayout {
-                        id: rowControlPanel
-                        Layout.preferredWidth: parent.width
-                        spacing: 0
-
-                        Item {
-                            Layout.fillWidth: true
-                        }
-
-                        Button {
-                            id: btFullscreen
-                            text: qsTr("Fullscreen")
-                            padding: 0
-                            Layout.fillWidth: false
-                            icon.height: 24
-                            icon.width: 24
-                            icon.source: "qrc:/FullScreen3DView/assets/fullscreen-24.png"
-                            display: AbstractButton.IconOnly
-                            Layout.alignment: Qt.AlignVCenter
-                        }
-                    }
-
                     Item {
+                        id: halfScreen3DSpace
                         Layout.fillWidth: true
                         Layout.fillHeight: true
 
@@ -105,6 +84,21 @@ Window {
                                     item.scale = Qt.vector3d(1.5, 1.5, 1.5)
                                 }
                             }
+                        }
+
+                        Button {
+                            id: btFullscreen
+                            anchors.top: halfScreen3DSpace.top
+                            anchors.topMargin: 20
+                            anchors.right: halfScreen3DSpace.right
+                            anchors.rightMargin: 20
+                            padding: 0
+                            Layout.fillWidth: false
+                            icon.height: 24
+                            icon.width: 24
+                            icon.source: "qrc:/FullScreen3DView/assets/fullscreen-24.png"
+                            display: AbstractButton.IconOnly
+                            Layout.alignment: Qt.AlignVCenter
                         }
                     }
                 }
