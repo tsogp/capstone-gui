@@ -1,9 +1,9 @@
 #include "mainwindow.h"
 #include "fullscreen3dwindow.h"
-#include <QQmlComponent>
-#include <QQuickWindow>
-#include <QQmlContext>
 #include <QDebug>
+#include <QQmlComponent>
+#include <QQmlContext>
+#include <QQuickWindow>
 
 #define MAINWINDOW_URL "qrc:/FullScreen3DView/qml/Mainscreen.qml"
 #define DEBUG_PREFIX "[MainWindow]:"

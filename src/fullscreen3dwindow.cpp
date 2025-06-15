@@ -4,8 +4,8 @@
 #define FULLSCREEN3DWINDOW_URL "qrc:/FullScreen3DView/qml/FullScreen3DWindow.qml"
 #define DEBUG_PREFIX "[FullScreen3DWindow]:"
 
-FullScreen3DWindow::FullScreen3DWindow(QQmlEngine* engine, QObject* parent)
-    : QObject(parent), m_engine(engine) {}
+FullScreen3DWindow::FullScreen3DWindow(QQmlEngine *engine, QObject *parent) : QObject(parent), m_engine(engine) {
+}
 
 void FullScreen3DWindow::show(const QString &data) {
     if (m_window && m_window->isVisible()) {
@@ -21,7 +21,7 @@ void FullScreen3DWindow::show(const QString &data) {
         return;
     }
 
-    m_window = qobject_cast<QQuickWindow*>(object);
+    m_window = qobject_cast<QQuickWindow *>(object);
     if (!m_window) {
         qWarning() << DEBUG_PREFIX << FULLSCREEN3DWINDOW_URL << " is not a window";
         delete object;

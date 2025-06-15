@@ -2,9 +2,9 @@
 #define __MAINWINDOW_H__
 
 #include "fullscreen3dwindow.h"
-#include <QQmlApplicationEngine>
-#include <QPointer>
 #include <QObject>
+#include <QPointer>
+#include <QQmlApplicationEngine>
 
 class MainWindow : public QQmlApplicationEngine {
     Q_OBJECT
@@ -17,7 +17,7 @@ private slots:
     void onFullScreen3DWindowClosed();
 
 private:
-    FullScreen3DWindow* m_secondWindow;
+    FullScreen3DWindow *m_secondWindow;
 };
 
 #endif // __MAINWINDOW_H__
