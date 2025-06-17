@@ -8,6 +8,9 @@
 int main(int argc, char *argv[]) {
     QGuiApplication app(argc, argv);
 
+    app.setOrganizationName(APP_ORGANIZATION_NAME);
+    app.setApplicationName(APP_NAME);
+
     MainWindow mainWindow;
     mainWindow.loadMainQml();
 

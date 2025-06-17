@@ -44,6 +44,11 @@ target_link_libraries(appFullScreen3DView PRIVATE
     Qt6::Test
 )
 
+target_compile_definitions(appFullScreen3DView PRIVATE
+    APP_ORGANIZATION_NAME="Unemployed"
+    APP_NAME="ABBQ"
+)
+
 include(GNUInstallDirs)
 install(TARGETS appFullScreen3DView
     BUNDLE DESTINATION .
