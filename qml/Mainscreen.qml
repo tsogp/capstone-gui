@@ -168,14 +168,11 @@ Window {
                             }
                             font.pixelSize: 16
                             Layout.fillWidth: true
-                             // will print "EUR", "Industrial", or "Asia"
                             onActivated: {
-                                console.log(currentText)
                                 mainWindow.updatePalletInfo(currentText)
                             }
 
                             Component.onCompleted: {
-                                // Force fire the handler for the default "EUR"
                                 mainWindow.updatePalletInfo(currentText)
                             }
 

@@ -2,10 +2,10 @@
 #define __MAINWINDOW_H__
 
 #include "fullscreen3dwindow.h"
+#include <QJsonArray>
 #include <QObject>
 #include <QPointer>
 #include <QQmlApplicationEngine>
-#include <QJsonArray>
 #include <qtmetamacros.h>
 
 class MainWindow : public QQmlApplicationEngine {
