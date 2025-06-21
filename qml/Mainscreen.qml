@@ -17,6 +17,14 @@ Window {
 
     property string currentModelSource: "qrc:/FullScreen3DView/assets/models/eur/EuroPallet.qml"
 
+    Connections {
+        target: mainWindow
+
+        function onPalletInfoUpdated(info) {
+            txtPalletInfo.text = info;
+        }
+    }
+
     Rectangle {
         id: mainScreen
         anchors.fill: parent
@@ -144,8 +152,8 @@ Window {
                         Text {
                             id: txtChoose
                             text: qsTr("Choose the pallet")
-                            font.pixelSize: 16
-                            
+                            font.pixelSize: 17
+                            font.bold: true
                         }
 
                         ComboBox {
@@ -160,6 +168,30 @@ Window {
                             }
                             font.pixelSize: 16
                             Layout.fillWidth: true
+                             // will print "EUR", "Industrial", or "Asia"
+                            onActivated: {
+                                console.log(currentText)
+                                mainWindow.updatePalletInfo(currentText)
+                            }
+
+                            Component.onCompleted: {
+                                // Force fire the handler for the default "EUR"
+                                mainWindow.updatePalletInfo(currentText)
+                            }
+
+                        }
+
+                        Text {
+                            text: qsTr("Pallet Info:")
+                            font.pixelSize: 17
+                            font.bold: true
+                        }
+
+                        Text {
+                            id: txtPalletInfo
+                            font.pixelSize: 16
+                            wrapMode: Text.Wrap
+                            Layout.fillWidth: true
                         }
 
                         RowLayout {
@@ -170,7 +202,8 @@ Window {
                             Text {
                                 id: txtPackage
                                 text: qsTr("Load the package list")
-                                font.pixelSize: 16
+                                font.pixelSize: 17
+                                font.bold: true
                                 
                             }
 

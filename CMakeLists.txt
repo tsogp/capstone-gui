@@ -27,6 +27,7 @@ qt_add_qml_module(appFullScreen3DView
         qml/Mainscreen.qml
     RESOURCES
         ${ASSET_FILES}
+        data/pallet.json
     RESOURCE_PREFIX /
 )
 
