@@ -25,6 +25,7 @@ qt_add_qml_module(appFullScreen3DView
     QML_FILES
         qml/FullScreen3DWindow.qml
         qml/Mainscreen.qml
+        qml/ThreeDView.qml
     RESOURCES
         ${ASSET_FILES}
         data/pallet.json
