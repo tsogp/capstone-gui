@@ -32,6 +32,7 @@ private slots:
     void onFullScreen3DWindowClosed();
 
 private:
+    std::unique_ptr<ThreeDSpaceView> m_3dView;
     FullScreen3DWindow *m_secondWindow = nullptr;
     QJsonArray palletArray;
     bool m_isFullScreenViewOpen = false;

@@ -9,7 +9,7 @@
 #define WINDOW_NAME "FullScreen3DWindow"
 #define DEBUG_PREFIX "[" WINDOW_NAME "]:"
 
-FullScreen3DWindow::FullScreen3DWindow(QQmlEngine *engine, QObject *parent) : QObject(parent), m_engine(engine) {
+FullScreen3DWindow::FullScreen3DWindow(QQmlEngine *engine) : m_engine(engine) {
 }
 
 void FullScreen3DWindow::writeSettings() {

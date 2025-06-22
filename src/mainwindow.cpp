@@ -1,11 +1,13 @@
 #include "mainwindow.h"
 #include "fullscreen3dwindow.h"
+#include "src/3d.h"
 #include <QDebug>
 #include <QFile>
 #include <QJsonObject>
 #include <QQmlComponent>
 #include <QQmlContext>
 #include <QQuickWindow>
+#include <memory>
 
 #define MAINWINDOW_URL "qrc:/FullScreen3DView/qml/Mainscreen.qml"
 #define WINDOW_NAME "MainWindow"
@@ -14,6 +16,7 @@
 MainWindow::MainWindow() {
     loadPalletsJson();
     m_secondWindow = new FullScreen3DWindow(this);
+    m_3dView = std::make_unique<ThreeDSpaceView>();
     rootContext()->setContextProperty("mainWindow", this);
 
     connect(m_secondWindow, &FullScreen3DWindow::closed, this, &MainWindow::onFullScreen3DWindowClosed);
@@ -24,14 +27,20 @@ void MainWindow::loadMainQml() {
 }
 
 void MainWindow::openFullScreen3DWindow(const QString &message) {
+    if (!m_3dView) {
+        return;
+    }
+
     qDebug() << DEBUG_PREFIX << "Full Screen 3D View opened.";
     m_isFullScreenViewOpen = true;
     emit isFullScreenViewOpenChanged();
+
+    m_secondWindow->setThreeDView(std::move(m_3dView));
     m_secondWindow->show(message);
 }
 
 void MainWindow::loadPalletsJson() {
-    QFile file(":/FullScreen3DView/data/pallet.json"); // Adjust the path as necessary
+    QFile file(":/FullScreen3DView/data/pallet.json");
     if (!file.open(QIODevice::ReadOnly)) {
         qWarning("Could not open JSON file.");
         return;
@@ -78,6 +87,10 @@ void MainWindow::updatePalletInfo(const QString &name) {
 }
 
 void MainWindow::onFullScreen3DWindowClosed() {
+    if (m_secondWindow) {
+        m_3dView = std::move(m_secondWindow->takeThreeDView());
+    }
+
     qDebug() << DEBUG_PREFIX << "Full Screen 3D View closed.";
     m_isFullScreenViewOpen = false;
     emit isFullScreenViewOpenChanged();

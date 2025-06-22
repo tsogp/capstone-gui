@@ -15,6 +15,7 @@ qt_add_executable(appFullScreen3DView
     src/main.cpp
     src/fullscreen3dwindow.cpp
     src/mainwindow.cpp
+    src/3d.cpp
 )
 
 file(GLOB_RECURSE ASSET_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} CONFIGURE_DEPENDS assets/*)

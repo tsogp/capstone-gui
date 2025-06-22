@@ -1,6 +1,7 @@
 #ifndef __FULLSCREEN3DWINDOW_H__
 #define __FULLSCREEN3DWINDOW_H__
 
+#include "3d.h"
 #include <QObject>
 #include <QPointer>
 #include <QProperty>
@@ -17,7 +18,7 @@ class FullScreen3DWindow : public QObject {
     Q_PROPERTY(bool isAutoMode READ isAutoMode WRITE setIsAutoMode NOTIFY isAutoModeChanged FINAL)
 
 public:
-    FullScreen3DWindow(QQmlEngine *engine, QObject *parent = nullptr);
+    FullScreen3DWindow(QQmlEngine *engine);
     void show(const QString &data);
 
     float zoomLevel() const {
@@ -40,6 +41,13 @@ public:
     }
     void setIsAutoMode(bool value);
 
+    void setThreeDView(std::unique_ptr<ThreeDSpaceView> view) {
+        m_3dView = std::move(view);
+    }
+
+    std::unique_ptr<ThreeDSpaceView> takeThreeDView() {
+        return std::move(m_3dView);
+    }
 signals:
     void closed();
     void finished(const QString &result);
@@ -51,6 +59,7 @@ signals:
 
 private:
     QPointer<QQuickWindow> m_window;
+    std::unique_ptr<ThreeDSpaceView> m_3dView;
     QQmlEngine *m_engine;
 
     float m_zoomLevel = 1;
