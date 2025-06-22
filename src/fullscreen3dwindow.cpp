@@ -69,6 +69,7 @@ void FullScreen3DWindow::show(const QString &data) {
         return;
     }
 
+    // TODO: create context in MainWindow, pass ptr here
     QQmlContext *context = new QQmlContext(m_engine->rootContext());
     context->setContextProperty("settingsBridge", this);
 

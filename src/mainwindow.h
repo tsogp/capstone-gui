@@ -33,6 +33,7 @@ private slots:
 
 private:
     std::unique_ptr<ThreeDSpaceView> m_3dView;
+    // TODO: move to unique_ptr
     FullScreen3DWindow *m_secondWindow = nullptr;
     QJsonArray palletArray;
     bool m_isFullScreenViewOpen = false;
