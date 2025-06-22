@@ -39,6 +39,7 @@ Item {
 
         Loader3D {
             id: palletLoader
+            objectName: "palletLoader"
             source: currentModelSource
             active: true
 

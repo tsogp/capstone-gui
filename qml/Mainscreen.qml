@@ -52,8 +52,22 @@ Window {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
 
-                        ThreeDView {
+                        StackLayout {
                             anchors.fill: parent
+                            currentIndex: mainWindow.isFullScreenViewOpen ? 1 : 0
+
+                            ThreeDView {
+                                id: halfScreenView
+                            }
+                            
+                            Text {
+                                text: qsTr("The 3D view is now in fullscreen.")
+                                Layout.alignment:Qt.AlignCenter
+                                font.pixelSize: 18
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                                wrapMode: Text.Wrap
+                            }
                         }
 
                         Button {

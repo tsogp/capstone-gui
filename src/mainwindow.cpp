@@ -25,6 +25,8 @@ void MainWindow::loadMainQml() {
 
 void MainWindow::openFullScreen3DWindow(const QString &message) {
     qDebug() << DEBUG_PREFIX << "Full Screen 3D View opened.";
+    m_isFullScreenViewOpen = true;
+    emit isFullScreenViewOpenChanged();
     m_secondWindow->show(message);
 }
 
@@ -77,4 +79,6 @@ void MainWindow::updatePalletInfo(const QString &name) {
 
 void MainWindow::onFullScreen3DWindowClosed() {
     qDebug() << DEBUG_PREFIX << "Full Screen 3D View closed.";
+    m_isFullScreenViewOpen = false;
+    emit isFullScreenViewOpenChanged();
 }
