@@ -49,5 +49,9 @@ Item {
                 item.scale = Qt.vector3d(1.5, 1.5, 1.5)
             }
         }
+
+        Node {
+            id: shapeSpawner
+        }
     }
 }

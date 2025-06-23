@@ -7,6 +7,7 @@
 #include <QObject>
 #include <QPointer>
 #include <QQmlApplicationEngine>
+#include <QScopedPointer>
 #include <qtmetamacros.h>
 
 class MainWindow : public QQmlApplicationEngine {
@@ -33,8 +34,8 @@ private slots:
 
 private:
     std::unique_ptr<ThreeDSpaceView> m_3dView;
-    // TODO: move to unique_ptr
-    FullScreen3DWindow *m_secondWindow = nullptr;
+    QPointer<QQmlContext> m_context;
+    QPointer<FullScreen3DWindow> m_secondWindow;
     QJsonArray palletArray;
     bool m_isFullScreenViewOpen = false;
 

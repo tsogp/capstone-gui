@@ -9,7 +9,8 @@
 #define WINDOW_NAME "FullScreen3DWindow"
 #define DEBUG_PREFIX "[" WINDOW_NAME "]:"
 
-FullScreen3DWindow::FullScreen3DWindow(QQmlEngine *engine) : m_engine(engine) {
+FullScreen3DWindow::FullScreen3DWindow(QQmlEngine *engine, QQmlContext *contextPtr)
+    : m_engine(engine), m_parentContext(contextPtr) {
 }
 
 void FullScreen3DWindow::writeSettings() {
@@ -69,14 +70,12 @@ void FullScreen3DWindow::show(const QString &data) {
         return;
     }
 
-    // TODO: create context in MainWindow, pass ptr here
-    QQmlContext *context = new QQmlContext(m_engine->rootContext());
-    context->setContextProperty("settingsBridge", this);
+    m_parentContext->setContextProperty("settingsBridge", this);
 
     readSettings();
 
-    QQmlComponent component(m_engine, QUrl(FULLSCREEN3DWINDOW_URL));
-    QObject *object = component.create(context);
+    QQmlComponent component(m_engine.data(), QUrl(FULLSCREEN3DWINDOW_URL));
+    QObject *object = component.create(m_parentContext.data());
 
     if (!object) {
         qWarning() << DEBUG_PREFIX << "Failed to load " << FULLSCREEN3DWINDOW_URL << ":" << component.errors();

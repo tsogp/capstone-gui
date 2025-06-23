@@ -1,6 +1,6 @@
 #include "mainwindow.h"
+#include "3d.h"
 #include "fullscreen3dwindow.h"
-#include "src/3d.h"
 #include <QDebug>
 #include <QFile>
 #include <QJsonObject>
@@ -15,9 +15,12 @@
 
 MainWindow::MainWindow() {
     loadPalletsJson();
-    m_secondWindow = new FullScreen3DWindow(this);
+
+    m_context = rootContext();
+    m_context->setContextProperty("mainWindow", this);
+
+    m_secondWindow = new FullScreen3DWindow(this, m_context);
     m_3dView = std::make_unique<ThreeDSpaceView>();
-    rootContext()->setContextProperty("mainWindow", this);
 
     connect(m_secondWindow, &FullScreen3DWindow::closed, this, &MainWindow::onFullScreen3DWindowClosed);
 }
