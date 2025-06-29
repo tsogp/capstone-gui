@@ -8,8 +8,6 @@ Item {
     id: root
     property alias view: view3D
 
-    property string currentModelSource: "qrc:/FullScreen3DView/assets/models/eur/EuroPallet.qml"
-
     View3D {
         id: view3D
         anchors.fill: parent
@@ -40,8 +38,9 @@ Item {
         Loader3D {
             id: palletLoader
             objectName: "palletLoader"
-            source: currentModelSource
+            source: threeDSpaceView.currentModelSource
             active: true
+            asynchronous: true
 
             onLoaded: {
                 item.position = Qt.vector3d(0, 30, 0)

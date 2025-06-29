@@ -7,11 +7,11 @@ Node {
     scale: Qt.vector3d(2, 2, 2)
 
     Model {
-        source: "qrc:/FullScreen3DView/assets/models/eur/meshes/wood_pallet.mesh"
+        source: "qrc:/FullScreen3DView/assets/models/euro/meshes/wood_pallet.mesh"
         materials: [
             PrincipledMaterial {
                 baseColorMap: Texture {
-                    source: "qrc:/FullScreen3DView/assets/models/eur/textures/wood-pallet.jpg"
+                    source: "qrc:/FullScreen3DView/assets/models/euro/textures/wood-pallet.jpg"
                 }
                 roughness: 1.0
             }

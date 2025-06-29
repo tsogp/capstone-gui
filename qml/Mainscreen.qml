@@ -138,7 +138,7 @@ Window {
                             Layout.preferredHeight: 30
                             editable: false
                             model: ListModel {
-                                ListElement { text: "EUR" }
+                                ListElement { text: "Euro" }
                                 ListElement { text: "Industrial" }
                                 ListElement { text: "Asia" }
                             }
