@@ -1,11 +1,14 @@
 #include "3d.h"
+#include "src/boxdata.h"
 #include <QDebug>
 #include <QMetaObject>
 #include <QQmlComponent>
 #include <QQmlContext>
 #include <QRandomGenerator>
 #include <algorithm>
+#include <qcontainerfwd.h>
 #include <qrandom.h>
+#include <qvariant.h>
 #include <qvectornd.h>
 
 #define WINDOW_NAME "3DWindow"
@@ -15,8 +18,16 @@ ThreeDSpaceView::ThreeDSpaceView(QQmlContext *contextPtr, QObject *parent) : QOb
     contextPtr->setContextProperty("threeDSpaceView", this);
 }
 
-void ThreeDSpaceView::genCoordinatesForNextBox() {
-    // TODO: create actual logic
+QVariantList ThreeDSpaceView::getBoxes() {
+    QVariantList list(m_boxes.size());
+    for (int i = 0; i < m_boxes.size(); ++i) {
+        list[i] = QVariant::fromValue(m_boxes.at(i));
+    }
+    return list;
+}
+
+BoxData ThreeDSpaceView::getNewBox() {
+    // TODO: create actual spwaning logic with collision detection
     int xVal = QRandomGenerator::global()->bounded(0, 20);
     int yVal = QRandomGenerator::global()->bounded(0, 20);
     int zVal = QRandomGenerator::global()->bounded(0, 20);
@@ -27,13 +38,8 @@ void ThreeDSpaceView::genCoordinatesForNextBox() {
     QVector3D scaleFactor(scale, scale, scale);
     QVector3D dimensions(100, 100, 100);
 
-    m_newBox.m_position = position;
-    m_newBox.m_rotation = rotation;
-    m_newBox.m_scaleFactor = scaleFactor;
-    m_newBox.m_dimensions = dimensions;
-}
+    BoxData newBox(dimensions, position, rotation, scaleFactor);
+    m_boxes.push(newBox);
 
-BoxData ThreeDSpaceView::getNewBox() {
-    genCoordinatesForNextBox();
-    return m_newBox;
+    return newBox;
 }

@@ -18,8 +18,10 @@ Item {
     property string boxSource: "qrc:/FullScreen3DView/assets/models/box/CartonBox.qml"
 
     Component.onCompleted: {
-        let box = threeDSpaceView.getNewBox();
-        console.log("Box data in QML:", box.position, box.scaleFactor);
+        let boxes = threeDSpaceView.getBoxes();
+        for (let i = 0; i < boxes.length; ++i) {
+            spawnBoxInQML(boxes[i].position, palletRotation, boxes[i].scaleFactor);
+        }
     }
 
     View3D {

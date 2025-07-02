@@ -6,6 +6,7 @@
 #include <QPointer>
 #include <QQmlApplicationEngine>
 #include <QQuickItem>
+#include <QStack>
 #include <QVector3D>
 #include <qqmlcontext.h>
 #include <qtmetamacros.h>
@@ -17,11 +18,10 @@ public:
     explicit ThreeDSpaceView(QQmlContext *contextPtr, QObject *parent = nullptr);
 
 public slots:
-    void genCoordinatesForNextBox();
     BoxData getNewBox();
-
+    QVariantList getBoxes();
 private:
-    BoxData m_newBox;
+    QStack<BoxData> m_boxes;
 };
 
 #endif // __3D_H__

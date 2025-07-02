@@ -52,11 +52,14 @@ Window {
                         Layout.fillHeight: true
 
                         StackLayout {
+                            id: layout
                             anchors.fill: parent
                             currentIndex: mainWindow.isFullScreenViewOpen ? 1 : 0
 
-                            ThreeDView {
-                                id: halfScreenView
+                            Loader {
+                                id: halfScreenLoader
+                                active: layout.currentIndex === 0
+                                sourceComponent: threeDViewComponent
                             }
 
                             Text {
@@ -66,6 +69,13 @@ Window {
                                 horizontalAlignment: Text.AlignHCenter
                                 verticalAlignment: Text.AlignVCenter
                                 wrapMode: Text.Wrap
+                            }
+
+                            Component {
+                                id: threeDViewComponent
+                                ThreeDView {
+                                    id: halfScreenView
+                                }
                             }
                         }
 
