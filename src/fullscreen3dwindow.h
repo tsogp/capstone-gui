@@ -18,7 +18,7 @@ class FullScreen3DWindow : public QObject {
     Q_PROPERTY(bool isAutoMode READ isAutoMode WRITE setIsAutoMode NOTIFY isAutoModeChanged FINAL)
 
 public:
-    FullScreen3DWindow(QQmlEngine *engine, QQmlContext *contextPtr);
+    FullScreen3DWindow(QQmlEngine *engine, QQmlContext *contextPtr, QObject *parent = nullptr);
     void show(const QString &data);
 
     float zoomLevel() const {

@@ -1,22 +1,57 @@
 #include "3d.h"
+#include <QDebug>
+#include <QMetaObject>
+#include <QQmlComponent>
+#include <QQmlContext>
+#include <QRandomGenerator>
+#include <qrandom.h>
+#include <qvectornd.h>
 
-ThreeDSpaceView::ThreeDSpaceView() {
+ThreeDSpaceView::ThreeDSpaceView(QQmlContext *contextPtr, QObject *parent) : QObject(parent) {
+    contextPtr->setContextProperty("threeDSpaceView", this);
 }
 
-void ThreeDSpaceView::setRootObject(QObject *root) {
-    m_root = root;
+QVector3D ThreeDSpaceView::newBoxPosition() const {
+    return m_newBoxPosition;
 }
 
-QString ThreeDSpaceView::currentModelSource() const {
-    if (!m_root) {
-        return QString();
+void ThreeDSpaceView::setNewBoxPosition(const QVector3D &position) {
+    if (m_newBoxPosition != position) {
+        m_newBoxPosition = position;
+        emit newBoxPositionChanged();
     }
-
-    return m_root->property("currentModelSource").toString();
 }
 
-void ThreeDSpaceView::setCurrentModelSource(const QString &src) {
-    if (m_root) {
-        m_root->setProperty("currentModelSource", src);
+QVector3D ThreeDSpaceView::newBoxRotation() const {
+    return m_newBoxRotation;
+}
+
+void ThreeDSpaceView::setNewBoxRotation(const QVector3D &rotation) {
+    if (m_newBoxRotation != rotation) {
+        m_newBoxRotation = rotation;
+        emit newBoxRotationChanged();
     }
+}
+
+QVector3D ThreeDSpaceView::newBoxScaleFactor() const {
+    return m_newBoxScaleFactor;
+}
+
+void ThreeDSpaceView::setNewBoxScaleFactor(const QVector3D &scaleFactor) {
+    if (m_newBoxScaleFactor != scaleFactor) {
+        m_newBoxScaleFactor = scaleFactor;
+        emit newBoxRotationChanged();
+    }
+}
+
+void ThreeDSpaceView::genCoordinatesForNextBox() {
+    // TODO: create actual logic
+    int xVal = QRandomGenerator::global()->bounded(0, 20);
+    int yVal = QRandomGenerator::global()->bounded(0, 20);
+    int zVal = QRandomGenerator::global()->bounded(0, 20);
+    float scale = QRandomGenerator::global()->bounded(1, 3);
+
+    setNewBoxPosition(QVector3D(xVal, yVal, zVal));
+    setNewBoxRotation(m_newBoxRotation);
+    setNewBoxScaleFactor(QVector3D(scale, scale, scale));
 }

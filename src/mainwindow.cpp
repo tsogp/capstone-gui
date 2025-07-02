@@ -19,8 +19,8 @@ MainWindow::MainWindow() {
     m_context = rootContext();
     m_context->setContextProperty("mainWindow", this);
 
-    m_secondWindow = new FullScreen3DWindow(this, m_context);
-    m_3dView = std::make_unique<ThreeDSpaceView>();
+    m_secondWindow = new FullScreen3DWindow(this, m_context, this);
+    m_3dView = std::make_unique<ThreeDSpaceView>(m_context, m_context);
 
     connect(m_secondWindow, &FullScreen3DWindow::closed, this, &MainWindow::onFullScreen3DWindowClosed);
 }
