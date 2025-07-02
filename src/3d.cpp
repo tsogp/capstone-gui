@@ -4,44 +4,15 @@
 #include <QQmlComponent>
 #include <QQmlContext>
 #include <QRandomGenerator>
+#include <algorithm>
 #include <qrandom.h>
 #include <qvectornd.h>
 
+#define WINDOW_NAME "3DWindow"
+#define DEBUG_PREFIX "[" WINDOW_NAME "]:"
+
 ThreeDSpaceView::ThreeDSpaceView(QQmlContext *contextPtr, QObject *parent) : QObject(parent) {
     contextPtr->setContextProperty("threeDSpaceView", this);
-}
-
-QVector3D ThreeDSpaceView::newBoxPosition() const {
-    return m_newBoxPosition;
-}
-
-void ThreeDSpaceView::setNewBoxPosition(const QVector3D &position) {
-    if (m_newBoxPosition != position) {
-        m_newBoxPosition = position;
-        emit newBoxPositionChanged();
-    }
-}
-
-QVector3D ThreeDSpaceView::newBoxRotation() const {
-    return m_newBoxRotation;
-}
-
-void ThreeDSpaceView::setNewBoxRotation(const QVector3D &rotation) {
-    if (m_newBoxRotation != rotation) {
-        m_newBoxRotation = rotation;
-        emit newBoxRotationChanged();
-    }
-}
-
-QVector3D ThreeDSpaceView::newBoxScaleFactor() const {
-    return m_newBoxScaleFactor;
-}
-
-void ThreeDSpaceView::setNewBoxScaleFactor(const QVector3D &scaleFactor) {
-    if (m_newBoxScaleFactor != scaleFactor) {
-        m_newBoxScaleFactor = scaleFactor;
-        emit newBoxRotationChanged();
-    }
 }
 
 void ThreeDSpaceView::genCoordinatesForNextBox() {
@@ -49,9 +20,20 @@ void ThreeDSpaceView::genCoordinatesForNextBox() {
     int xVal = QRandomGenerator::global()->bounded(0, 20);
     int yVal = QRandomGenerator::global()->bounded(0, 20);
     int zVal = QRandomGenerator::global()->bounded(0, 20);
-    float scale = QRandomGenerator::global()->bounded(1, 3);
+    double scale = std::max(1.0, QRandomGenerator::global()->generateDouble() * 3.0);
 
-    setNewBoxPosition(QVector3D(xVal, yVal, zVal));
-    setNewBoxRotation(m_newBoxRotation);
-    setNewBoxScaleFactor(QVector3D(scale, scale, scale));
+    QVector3D position(xVal, yVal, 35);
+    QVector3D rotation(0, 0, 0);
+    QVector3D scaleFactor(scale, scale, scale);
+    QVector3D dimensions(100, 100, 100);
+
+    m_newBox.m_position = position;
+    m_newBox.m_rotation = rotation;
+    m_newBox.m_scaleFactor = scaleFactor;
+    m_newBox.m_dimensions = dimensions;
+}
+
+BoxData ThreeDSpaceView::getNewBox() {
+    genCoordinatesForNextBox();
+    return m_newBox;
 }

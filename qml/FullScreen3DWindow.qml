@@ -37,10 +37,10 @@ Window {
     }
 
     Component.onCompleted: {
-        zoomSlider.value = settingsBridge.zoomLevel
-        viewSlider.first.value = settingsBridge.viewSliderFirst
-        viewSlider.second.value = settingsBridge.viewSliderSecond
-        autoModeToggle.checked = settingsBridge.isAutoMode
+        zoomSlider.value = settingsBridge.zoomLevel;
+        viewSlider.first.value = settingsBridge.viewSliderFirst;
+        viewSlider.second.value = settingsBridge.viewSliderSecond;
+        autoModeToggle.checked = settingsBridge.isAutoMode;
     }
 
     ThreeDView {
@@ -91,7 +91,6 @@ Window {
             first.onValueChanged: settingsBridge.viewSliderFirst = first.value
             second.onValueChanged: settingsBridge.viewSliderSecond = second.value
         }
-
 
         RowLayout {
             spacing: 10

@@ -7,7 +7,6 @@ import QtQuick3D
 import QtQuick3D.Helpers
 import QtQuick3D.AssetUtils
 
-
 Window {
     id: mainscreen
     width: 1280
@@ -59,10 +58,10 @@ Window {
                             ThreeDView {
                                 id: halfScreenView
                             }
-                            
+
                             Text {
                                 text: qsTr("The 3D view is now in fullscreen.")
-                                Layout.alignment:Qt.AlignCenter
+                                Layout.alignment: Qt.AlignCenter
                                 font.pixelSize: 18
                                 horizontalAlignment: Text.AlignHCenter
                                 verticalAlignment: Text.AlignVCenter
@@ -138,20 +137,25 @@ Window {
                             Layout.preferredHeight: 30
                             editable: false
                             model: ListModel {
-                                ListElement { text: "EUR" }
-                                ListElement { text: "Industrial" }
-                                ListElement { text: "Asia" }
+                                ListElement {
+                                    text: "EUR"
+                                }
+                                ListElement {
+                                    text: "Industrial"
+                                }
+                                ListElement {
+                                    text: "Asia"
+                                }
                             }
                             font.pixelSize: 16
                             Layout.fillWidth: true
                             onActivated: {
-                                mainWindow.updatePalletInfo(currentText)
+                                mainWindow.updatePalletInfo(currentText);
                             }
 
                             Component.onCompleted: {
-                                mainWindow.updatePalletInfo(currentText)
+                                mainWindow.updatePalletInfo(currentText);
                             }
-
                         }
 
                         Text {
@@ -177,7 +181,6 @@ Window {
                                 text: qsTr("Load the package list")
                                 font.pixelSize: 17
                                 font.bold: true
-                                
                             }
 
                             Item {

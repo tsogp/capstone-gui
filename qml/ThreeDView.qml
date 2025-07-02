@@ -9,16 +9,18 @@ Item {
     id: root
 
     readonly property vector3d cameraPosition: Qt.vector3d(0, 10, 300)
-    readonly property vector3d palletRotation: Qt.vector3d(15, 70, 30)
     readonly property vector3d lightRotation: Qt.vector3d(-25.34759, -2.67751, -19.212)
 
-    property vector3d newBoxPosition: threeDSpaceView.newBoxPosition
-    property vector3d newBoxRotation: palletRotation
-    property vector3d newBoxScaleFactor: threeDSpaceView.newBoxScaleFactor
-
     property alias view: view3D
+
+    property vector3d palletRotation: Qt.vector3d(15, 70, 30)
     property string currentModelSource: "qrc:/FullScreen3DView/assets/models/eur/EuroPallet.qml"
     property string boxSource: "qrc:/FullScreen3DView/assets/models/box/CartonBox.qml"
+
+    Component.onCompleted: {
+        let box = threeDSpaceView.getNewBox();
+        console.log("Box data in QML:", box.position, box.scaleFactor);
+    }
 
     View3D {
         id: view3D
@@ -54,9 +56,9 @@ Item {
             active: true
 
             onLoaded: {
-                item.position = Qt.vector3d(0, 30, 0)
-                item.eulerRotation = palletRotation
-                item.scale = Qt.vector3d(1.5, 1.5, 1.5)
+                item.position = Qt.vector3d(0, 30, 0);
+                item.eulerRotation = palletRotation;
+                item.scale = Qt.vector3d(1.5, 1.5, 1.5);
             }
         }
 
@@ -80,14 +82,14 @@ Item {
         }
 
         onClicked: {
-            threeDSpaceView.genCoordinatesForNextBox()
-            spawnBoxInQML(newBoxPosition, newBoxRotation, newBoxScaleFactor)
+            let box = threeDSpaceView.getNewBox();
+            spawnBoxInQML(box.position, palletRotation, box.scaleFactor);
         }
     }
 
     function spawnBoxInQML(position, rotation, scale) {
         // TODO: remove, for debugging only
-        console.log("Spawning box at", position, "with rotation", rotation, "with scale", scale)
+        console.log("Spawning box at", position, "with rotation", rotation, "with scale", scale);
         var component = Qt.createComponent(boxSource);
         if (component.status === Component.Ready) {
             var box = component.createObject(shapeSpawner, {

@@ -1,3 +1,4 @@
+#include "boxdata.h"
 #include "mainwindow.h"
 
 #include <QDebug>
@@ -10,6 +11,8 @@ int main(int argc, char *argv[]) {
 
     app.setOrganizationName(APP_ORGANIZATION_NAME);
     app.setApplicationName(APP_NAME);
+
+    qRegisterMetaType<BoxData>("BoxData");
 
     MainWindow mainWindow;
     mainWindow.loadMainQml();
