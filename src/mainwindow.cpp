@@ -8,6 +8,8 @@
 #include <QQmlContext>
 #include <QQuickWindow>
 #include <memory>
+#include <qdebug.h>
+#include <qobject.h>
 
 #define MAINWINDOW_URL "qrc:/FullScreen3DView/qml/Mainscreen.qml"
 #define WINDOW_NAME "MainWindow"
@@ -71,6 +73,7 @@ void MainWindow::updatePalletInfo(const QString &name) {
     for (const QJsonValue &value : palletArray) {
         QJsonObject obj = value.toObject();
         if (obj["type"].toString().toLower().contains(name.toLower())) {
+            m_3dView->setCurrentModelSource(name);
             QString info = QString("Pallet type: %1\nDimension: %2\nLoad-bearing capacity: %3\nExtra load: %4\nDead "
                                    "load: %5\nStandard: %6\nApplication: %7")
                                .arg(obj["type"].toString())

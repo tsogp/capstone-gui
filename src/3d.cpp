@@ -18,6 +18,10 @@ ThreeDSpaceView::ThreeDSpaceView(QQmlContext *contextPtr, QObject *parent) : QOb
     contextPtr->setContextProperty("threeDSpaceView", this);
 }
 
+QString ThreeDSpaceView::currentModelSource() const {
+    return m_currentModelSource;
+}
+
 QVariantList ThreeDSpaceView::getBoxes() {
     QVariantList list(m_boxes.size());
     for (int i = 0; i < m_boxes.size(); ++i) {
@@ -42,4 +46,14 @@ BoxData ThreeDSpaceView::getNewBox() {
     m_boxes.push(newBox);
 
     return newBox;
+}
+
+void ThreeDSpaceView::setCurrentModelSource(const QString &src) {
+    if (m_currentModelSource != src) {
+        QString path = QString("qrc:/FullScreen3DView/assets/models/%1/%2Pallet.qml").arg(src.toLower(), src);
+        m_currentModelSource = path;
+        emit currentModelSourceChanged(path);
+
+        qDebug() << "currentModelSource updated to:" << src;
+    }
 }

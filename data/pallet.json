@@ -2,7 +2,7 @@
     "pallets": [
         {
             "id": 1,
-            "type": "EUR",
+            "type": "Euro",
             "dimension": "800 x 1200 mm",
             "load_bearing_capacity": "1500 kg",
             "extra_load": "6000 kg",

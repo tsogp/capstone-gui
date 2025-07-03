@@ -148,7 +148,7 @@ Window {
                             editable: false
                             model: ListModel {
                                 ListElement {
-                                    text: "EUR"
+                                    text: "Euro"
                                 }
                                 ListElement {
                                     text: "Industrial"

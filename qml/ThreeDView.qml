@@ -54,8 +54,9 @@ Item {
         Loader3D {
             id: palletLoader
             objectName: "palletLoader"
-            source: currentModelSource
+            source: threeDSpaceView.currentModelSource
             active: true
+            asynchronous: true
 
             onLoaded: {
                 item.position = Qt.vector3d(0, 30, 0);

@@ -12,7 +12,7 @@ Node {
             PrincipledMaterial {
                 id: cartonBoxDefaultMaterial
                 baseColorMap: Texture {
-                    source: "qrc:/FullScreen3DView/assets/models/ind/textures/ind_pallet.jpg"
+                    source: "qrc:/FullScreen3DView/assets/models/industrial/textures/ind_pallet.jpg"
                 }
                 roughness: 1
                 metalness: 0.1
