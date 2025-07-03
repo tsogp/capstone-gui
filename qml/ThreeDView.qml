@@ -13,14 +13,44 @@ Item {
 
     property alias view: view3D
 
+    property vector2d rotationDelta: Qt.vector2d(0, 0)
     property vector3d palletRotation: Qt.vector3d(15, 70, 30)
     property string currentModelSource: "qrc:/FullScreen3DView/assets/models/eur/EuroPallet.qml"
     property string boxSource: "qrc:/FullScreen3DView/assets/models/box/CartonBox.qml"
 
     Component.onCompleted: {
+        rotationDelta.x = -palletRotation.y;
+
         let boxes = threeDSpaceView.getBoxes();
         for (let i = 0; i < boxes.length; ++i) {
             spawnBoxInQML(boxes[i].position, palletRotation, boxes[i].scaleFactor);
+        }
+    }
+
+    MouseArea {
+        id: mouseArea
+        anchors.fill: parent
+        drag.target: null
+
+        property real lastX
+        property real lastY
+
+        onPressed: {
+            lastX = mouseX;
+            lastY = mouseY;
+        }
+
+        onPositionChanged: {
+            const deltaX = (lastX - mouseX) * 0.5;
+            const deltaY = (lastY - mouseY) * 0.5;
+
+            rotationDelta.x += deltaX;
+            rotationDelta.y += deltaY;
+
+            lastX = mouseX;
+            lastY = mouseY;
+
+            applyRotationToAll();
         }
     }
 
@@ -51,24 +81,28 @@ Item {
             ambientColor: Qt.rgba(0.5, 0.5, 0.5, 1.0)
         }
 
-        Loader3D {
-            id: palletLoader
-            objectName: "palletLoader"
-            source: threeDSpaceView.currentModelSource
-            active: true
-            asynchronous: true
-
-            onLoaded: {
-                item.position = Qt.vector3d(0, 30, 0);
-                item.eulerRotation = palletRotation;
-                item.scale = Qt.vector3d(1.5, 1.5, 1.5);
-            }
-        }
-
         Node {
-            id: shapeSpawner
-            position: Qt.vector3d(0, 30, 0)
-            objectName: "shapeSpawner"
+            id: rotationRoot
+            eulerRotation: palletRotation
+
+            Loader3D {
+                id: palletLoader
+                objectName: "palletLoader"
+                source: threeDSpaceView.currentModelSource
+                active: true
+                asynchronous: true
+
+                onLoaded: {
+                    item.position = Qt.vector3d(0, 5, 0);
+                    item.scale = Qt.vector3d(1.5, 1.5, 1.5);
+                }
+            }
+
+            Node {
+                id: shapeSpawner
+                position: Qt.vector3d(0, 30, 0)
+                objectName: "shapeSpawner"
+            }
         }
     }
 
@@ -86,18 +120,21 @@ Item {
 
         onClicked: {
             let box = threeDSpaceView.getNewBox();
-            spawnBoxInQML(box.position, palletRotation, box.scaleFactor);
+            spawnBoxInQML(box.position, box.scaleFactor);
         }
     }
 
-    function spawnBoxInQML(position, rotation, scale) {
+    function applyRotationToAll() {
+        rotationRoot.eulerRotation.y = -rotationDelta.x;
+    }
+
+    function spawnBoxInQML(position, scale) {
         // TODO: remove, for debugging only
-        console.log("Spawning box at", position, "with rotation", rotation, "with scale", scale);
+        console.log("Spawning box at", position, "with scale", scale);
         var component = Qt.createComponent(boxSource);
         if (component.status === Component.Ready) {
             var box = component.createObject(shapeSpawner, {
                 "position": position,
-                "eulerRotation": rotation,
                 "scale": scale
             });
             if (!box) {
