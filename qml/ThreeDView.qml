@@ -13,17 +13,36 @@ Item {
 
     property alias view: view3D
 
+    property real zoomMin: 0.5
+    property real zoomMax: 3.0
+    property real zoomLevel: 1.0
     property vector2d rotationDelta: Qt.vector2d(0, 0)
     property vector3d palletRotation: Qt.vector3d(15, 70, 30)
     property string currentModelSource: "qrc:/FullScreen3DView/assets/models/eur/EuroPallet.qml"
     property string boxSource: "qrc:/FullScreen3DView/assets/models/box/CartonBox.qml"
 
     Component.onCompleted: {
-        rotationDelta.x = -palletRotation.y;
+        rotationDelta = threeDSpaceView.rotationDelta;
+        zoomLevel = threeDSpaceView.zoomLevel;
+    
+        applyRotationToAll();
+        applyZoomToAll();
 
         let boxes = threeDSpaceView.getBoxes();
         for (let i = 0; i < boxes.length; ++i) {
-            spawnBoxInQML(boxes[i].position, palletRotation, boxes[i].scaleFactor);
+            spawnBoxInQML(boxes[i].position, boxes[i].scaleFactor);
+        }
+    }
+
+    Connections {
+        target: threeDSpaceView
+
+        function onRotationDeltaChanged() {
+            rotationDelta = threeDSpaceView.rotationDelta;
+        }
+
+        function onZoomLevelChanged() {
+            zoomLevel = threeDSpaceView.zoomLevel;
         }
     }
 
@@ -52,6 +71,8 @@ Item {
 
             applyRotationToAll();
         }
+
+        onWheel: wheel => modifyZoomLevel(wheel.angleDelta.y / (Math.abs(wheel.angleDelta.y) * 10), wheel.inverted)
     }
 
     View3D {
@@ -126,6 +147,7 @@ Item {
 
     function applyRotationToAll() {
         rotationRoot.eulerRotation.y = -rotationDelta.x;
+        threeDSpaceView.rotationDelta = rotationDelta;
     }
 
     function spawnBoxInQML(position, scale) {
@@ -143,5 +165,20 @@ Item {
         } else {
             console.error("Box component error:", component.errorString());
         }
+    }
+
+    function modifyZoomLevel(incValue, isInverted) {
+        let delta = isInverted ? -incValue : incValue;
+        if (delta >= 0) {
+            zoomLevel = Math.min(zoomLevel + delta, zoomMax);
+        } else {
+            zoomLevel = Math.max(zoomLevel + delta, zoomMin);
+        }
+        applyZoomToAll();
+    }
+
+    function applyZoomToAll() {
+        threeDSpaceView.zoomLevel = zoomLevel;
+        camera.position.z = cameraPosition.z / zoomLevel;
     }
 }

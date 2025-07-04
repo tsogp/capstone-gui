@@ -16,7 +16,6 @@ FullScreen3DWindow::FullScreen3DWindow(QQmlEngine *engine, QQmlContext *contextP
 void FullScreen3DWindow::writeSettings() {
     QSettings settings;
     settings.beginGroup(WINDOW_NAME);
-    settings.setValue("zoomLevel", m_zoomLevel);
     settings.setValue("viewSliderFirst", m_viewSliderFirst);
     settings.setValue("viewSliderSecond", m_viewSliderSecond);
     settings.setValue("isAutoMode", m_isAutoMode);
@@ -27,18 +26,10 @@ void FullScreen3DWindow::readSettings() {
     QSettings settings;
 
     settings.beginGroup(WINDOW_NAME);
-    m_zoomLevel = settings.value("zoomLevel", 1.0).toFloat();
     m_viewSliderFirst = settings.value("viewSliderFirst", 0.0).toFloat();
     m_viewSliderSecond = settings.value("viewSliderSecond", 100.0).toFloat();
     m_isAutoMode = settings.value("isAutoMode", false).toBool();
     settings.endGroup();
-}
-
-void FullScreen3DWindow::setZoomLevel(float value) {
-    if (m_zoomLevel != value) {
-        m_zoomLevel = value;
-        emit zoomLevelChanged();
-    }
 }
 
 void FullScreen3DWindow::setViewSliderFirst(float value) {

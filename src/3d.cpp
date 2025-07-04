@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <qcontainerfwd.h>
 #include <qrandom.h>
+#include <qsettings.h>
 #include <qvariant.h>
 #include <qvectornd.h>
 
@@ -16,10 +17,15 @@
 
 ThreeDSpaceView::ThreeDSpaceView(QQmlContext *contextPtr, QObject *parent) : QObject(parent) {
     contextPtr->setContextProperty("threeDSpaceView", this);
+    readSettings();
 }
 
 QString ThreeDSpaceView::currentModelSource() const {
     return m_currentModelSource;
+}
+
+QVector2D ThreeDSpaceView::rotationDelta() const {
+    return m_rotationDelta;
 }
 
 QVariantList ThreeDSpaceView::getBoxes() {
@@ -56,4 +62,43 @@ void ThreeDSpaceView::setCurrentModelSource(const QString &src) {
 
         qDebug() << "currentModelSource updated to:" << src;
     }
+}
+
+void ThreeDSpaceView::setRotationDelta(const QVector2D &rotationDelta) {
+    if (m_rotationDelta != rotationDelta) {
+        m_rotationDelta = rotationDelta;
+        emit rotationDeltaChanged();
+    }
+}
+
+void ThreeDSpaceView::writeSettings() {
+    QSettings settings;
+    settings.beginGroup(WINDOW_NAME);
+    settings.setValue("rotationDelta", m_rotationDelta);
+    settings.setValue("zoomLevel", m_zoomLevel);
+    settings.endGroup();
+}
+
+void ThreeDSpaceView::readSettings() {
+    QSettings settings;
+
+    settings.beginGroup(WINDOW_NAME);
+    m_rotationDelta = qvariant_cast<QVector2D>(settings.value("rotationDelta", QVector2D(0, 0)));
+    m_zoomLevel = settings.value("zoomLevel", 1.0).toFloat();
+    settings.endGroup();
+}
+
+float ThreeDSpaceView::zoomLevel() const {
+    return m_zoomLevel;
+}
+
+void ThreeDSpaceView::setZoomLevel(float value) {
+    if (m_zoomLevel != value) {
+        m_zoomLevel = value;
+        emit zoomLevelChanged();
+    }
+}
+
+ThreeDSpaceView::~ThreeDSpaceView() {
+    writeSettings();
 }

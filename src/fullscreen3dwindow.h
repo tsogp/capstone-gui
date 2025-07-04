@@ -11,7 +11,6 @@
 class FullScreen3DWindow : public QObject {
     Q_OBJECT
 
-    Q_PROPERTY(float zoomLevel READ zoomLevel WRITE setZoomLevel NOTIFY zoomLevelChanged FINAL)
     Q_PROPERTY(float viewSliderFirst READ viewSliderFirst WRITE setViewSliderFirst NOTIFY viewSliderFirstChanged FINAL)
     Q_PROPERTY(
         float viewSliderSecond READ viewSliderSecond WRITE setViewSliderSecond NOTIFY viewSliderSecondChanged FINAL)
@@ -20,11 +19,6 @@ class FullScreen3DWindow : public QObject {
 public:
     FullScreen3DWindow(QQmlEngine *engine, QQmlContext *contextPtr, QObject *parent = nullptr);
     void show(const QString &data);
-
-    float zoomLevel() const {
-        return m_zoomLevel;
-    }
-    void setZoomLevel(float value);
 
     float viewSliderFirst() const {
         return m_viewSliderFirst;
@@ -52,7 +46,6 @@ signals:
     void closed();
     void finished(const QString &result);
 
-    void zoomLevelChanged();
     void viewSliderFirstChanged();
     void viewSliderSecondChanged();
     void isAutoModeChanged();
@@ -63,7 +56,6 @@ private:
     QPointer<QQmlContext> m_parentContext;
     std::unique_ptr<ThreeDSpaceView> m_3dView;
 
-    float m_zoomLevel = 1;
     float m_viewSliderFirst = 0;
     float m_viewSliderSecond = 100;
     bool m_isAutoMode = false;

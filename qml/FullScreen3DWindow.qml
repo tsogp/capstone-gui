@@ -19,10 +19,6 @@ Window {
     Connections {
         target: settingsBridge
 
-        function onZoomLevelChanged() {
-            zoomSlider.value = settingsBridge.zoomLevel;
-        }
-
         function onViewSliderFirstChanged() {
             viewSlider.first.value = settingsBridge.viewSliderFirst;
         }
@@ -37,7 +33,6 @@ Window {
     }
 
     Component.onCompleted: {
-        zoomSlider.value = settingsBridge.zoomLevel;
         viewSlider.first.value = settingsBridge.viewSliderFirst;
         viewSlider.second.value = settingsBridge.viewSliderSecond;
         autoModeToggle.checked = settingsBridge.isAutoMode;
@@ -46,6 +41,13 @@ Window {
     ThreeDView {
         id: threeDView
         anchors.fill: parent
+        zoomLevel: zoomSlider.value
+        zoomMin: zoomSlider.from
+        zoomMax: zoomSlider.to
+
+        onZoomLevelChanged: {
+            zoomSlider.value = zoomLevel;
+        }
     }
 
     Item {
