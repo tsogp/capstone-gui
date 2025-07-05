@@ -83,3 +83,4 @@ CMakeLists.txt.user*
 .cache/
 Testing/
 .vscode/launch.json
+.vscode/tasks.json

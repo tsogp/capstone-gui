@@ -42,7 +42,6 @@ void FullScreen3DWindow::setViewSliderFirst(float value) {
 void FullScreen3DWindow::setViewSliderSecond(float value) {
     if (m_viewSliderSecond != value) {
         m_viewSliderSecond = value;
-        qDebug() << DEBUG_PREFIX << m_viewSliderSecond << value;
         emit viewSliderSecondChanged();
     }
 }
