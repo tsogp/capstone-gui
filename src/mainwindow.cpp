@@ -92,6 +92,117 @@ void MainWindow::updatePalletInfo(const QString &name) {
     qDebug() << DEBUG_PREFIX << "No pallet data found.";
 }
 
+QString MainWindow::getRawJson() const {
+    return m_rawJson;
+}
+
+QString MainWindow::getValidBoxesSummary() const {
+    QString summary;
+    for (const auto &box : m_boxes) {
+        summary += QString("Box %1: %2x%3x%4, weight %5, maxLoad %6\n")
+                       .arg(box.id)
+                       .arg(box.w)
+                       .arg(box.l)
+                       .arg(box.h)
+                       .arg(box.weight)
+                       .arg(box.maxLoad);
+    }
+    return summary;
+}
+
+QString MainWindow::getInvalidBoxesSummary() const {
+    if (m_invalidBoxes.isEmpty())
+        return "No invalid boxes found.";
+
+    QString summary;
+    for (int i = 0; i < m_invalidBoxes.size(); ++i) {
+        summary += QString("Invalid Box %1: %2\n").arg(i).arg(m_invalidBoxes[i]);
+    }
+    return summary;
+}
+
+void MainWindow::processJsonFile(const QUrl &fileUrl) {
+    QString path = fileUrl.toLocalFile();
+
+    auto fail = [&](const QString &msg) {
+        m_jsonErrorMessage = msg;
+        m_isJsonLoaded = false;
+        emit jsonErrorMessageChanged();
+        emit isJsonLoadedChanged();
+        qWarning() << "JSON error:" << msg;
+    };
+
+    QFile file(path);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        fail("Cannot open file: " + path);
+        return;
+    }
+
+    QJsonParseError error;
+    QByteArray data = file.readAll();
+    QJsonDocument doc = QJsonDocument::fromJson(data, &error);
+    file.close();
+
+
+    if (error.error != QJsonParseError::NoError) {
+        fail("JSON parse error: " + error.errorString());
+        return;
+    } else if (!doc.isObject()) {
+        fail("Incorrect format: JSON is not an object.");
+        return;
+    }
+
+    QJsonObject root = doc.object();
+    if (!root.contains("boxes") || !root["boxes"].isArray()) {
+        fail("Incorrect format: Missing or invalid 'boxes' array.");
+        return;
+    }
+
+    
+    QJsonArray boxArray = root["boxes"].toArray();
+    QVector<Box> parsedBoxes;
+    QList<QString> invalidBoxes;
+
+    for (const QJsonValue &val : boxArray) {
+        if (!val.isObject()) {
+            invalidBoxes.append(QStringLiteral("{ /* Invalid entry: not an object */ }"));
+            continue;
+        }
+
+        QJsonObject obj = val.toObject();
+        bool ok = obj.contains("id") && obj.contains("w") && obj.contains("l") && obj.contains("h") &&
+                  obj.contains("weight") && obj.contains("max_load");
+
+        if (!ok) {
+            invalidBoxes.append(QString::fromUtf8(QJsonDocument(obj).toJson(QJsonDocument::Compact)));
+            continue;
+        }
+
+        Box b;
+        b.id = obj["id"].toInt();
+        b.w = obj["w"].toInt();
+        b.l = obj["l"].toInt();
+        b.h = obj["h"].toInt();
+        b.weight = obj["weight"].toDouble();
+        b.maxLoad = obj["max_load"].toInt();
+        parsedBoxes.append(b);
+    }
+
+    m_boxes = parsedBoxes;
+    m_invalidBoxes = invalidBoxes;
+    m_rawJson = QString::fromUtf8(data);
+    m_jsonErrorMessage.clear();
+    m_isJsonLoaded = true;
+    emit jsonErrorMessageChanged();
+    emit isJsonLoadedChanged();
+    qDebug() << "Loaded" << m_boxes.size() << "valid boxes,"
+             << m_invalidBoxes.size() << "invalid entries.";
+}
+
+bool MainWindow::isJsonLoaded() const {
+    return m_isJsonLoaded;
+}
+
 void MainWindow::onFullScreen3DWindowClosed() {
     if (m_secondWindow) {
         m_3dView = std::move(m_secondWindow->takeThreeDView());

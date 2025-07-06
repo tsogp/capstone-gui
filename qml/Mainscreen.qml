@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Window
 import QtQuick.Layouts
 import QtQuick.Controls
+import QtQuick.Dialogs
 
 import QtQuick3D
 import QtQuick3D.Helpers
@@ -215,6 +216,45 @@ Window {
                             text: qsTr("Browse")
                             font.pixelSize: 16
                             icon.source: "qrc:/FullScreen3DView/assets/folder-24.png"
+                            onClicked: {
+                                fileDialog.open();
+                            }
+                        }
+
+                        FileDialog {
+                            id: fileDialog
+                            title: "Select a JSON file"
+                            nameFilters: ["JSON files (*.json)"]
+                            fileMode: FileDialog.OpenFile
+                            onAccepted: {
+                                console.log("Selected file:", fileDialog.selectedFile)
+                                mainWindow.processJsonFile(fileDialog.selectedFile)
+                            }
+                        }
+
+                        Text {
+                            id: jsonErrorText
+                            text: mainWindow.jsonErrorMessage
+                            color: "red"
+                            font.bold: true
+                            visible: text.length > 0
+                            wrapMode: Text.Wrap
+                        }
+
+                        Button {
+                            text: "Preview JSON"
+                            enabled: mainWindow.isJsonLoaded
+                            onClicked: {
+                                const component = Qt.createComponent("qrc:/FullScreen3DView/qml/PreviewWindow.qml");
+                                if (component.status === Component.Ready) {
+                                    const preview = component.createObject(null);
+                                    if (!preview) {
+                                        console.log("Failed to create PreviewWindow");
+                                    }
+                                } else {
+                                    console.log("Failed to load PreviewWindow.qml:", component.errorString());
+                                }
+                            }
                         }
                     }
 
@@ -227,7 +267,6 @@ Window {
                         Layout.fillWidth: true
                         Layout.preferredHeight: btStartSimulation.height
                         spacing: 0
-                        visible: false
 
                         Item {
                             Layout.fillWidth: true
@@ -235,6 +274,7 @@ Window {
 
                         Button {
                             id: btStartSimulation
+                            enabled: mainWindow.isJsonLoaded
                             Layout.preferredWidth: 200
                             Layout.preferredHeight: 40
                             text: qsTr("Start simulation")
