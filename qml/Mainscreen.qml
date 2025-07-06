@@ -206,6 +206,9 @@ Window {
                                 icon.source: "qrc:/FullScreen3DView/assets/info-24.png"
                                 icon.color: "#006dd9"
                                 display: AbstractButton.IconOnly
+                                ToolTip.visible: hovered
+                                ToolTip.delay: 0
+                                ToolTip.text: "Expected format:\n{\n  \"boxes\": [\n    { \"w\": int, \"l\": int, \"h\": int,\n      \"weight\": float, \"max_load\": int }\n  ]\n}"
                             }
                         }
 
