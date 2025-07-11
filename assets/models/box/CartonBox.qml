@@ -3,6 +3,7 @@ import QtQuick3D
 
 Node {
     id: cartonBox
+    property vector3d dimensions: Qt.vector3d(0, 0, 0)
 
     Model {
         id: cartonBoxModel

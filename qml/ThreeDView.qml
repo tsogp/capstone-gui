@@ -21,17 +21,37 @@ Item {
     property string currentModelSource: "qrc:/FullScreen3DView/assets/models/eur/EuroPallet.qml"
     property string boxSource: "qrc:/FullScreen3DView/assets/models/box/CartonBox.qml"
 
+    property real slideLeft: 0.0
+    property real slideRight: 0.0
+
+    property var spawnedBoxes: []
+
+    onSlideLeftChanged: {
+        const zMin = -61;
+        const zMax = 61;
+        leftPlane.position.z = zMin + (zMax - zMin) * (slideLeft / 100);
+        checkCollisions();
+    }
+
+    onSlideRightChanged: {
+        const zMax = 61;
+        const zMin = -61;
+        rightPlane.position.z = zMax - (zMax - zMin) * (1 - slideRight / 100);
+        checkCollisions();
+    }
+
     Component.onCompleted: {
         rotationDelta = threeDSpaceView.rotationDelta;
         zoomLevel = threeDSpaceView.zoomLevel;
-    
+
         applyRotationToAll();
         applyZoomToAll();
 
         let boxes = threeDSpaceView.getBoxes();
         for (let i = 0; i < boxes.length; ++i) {
-            spawnBoxInQML(boxes[i].position, boxes[i].scaleFactor);
+            spawnBoxInQML(boxes[i].position, boxes[i].scaleFactor, boxes[i].dimensions);
         }
+        spawnedBoxes = boxes;
     }
 
     Connections {
@@ -124,6 +144,40 @@ Item {
                 position: Qt.vector3d(0, 30, 0)
                 objectName: "shapeSpawner"
             }
+
+            Node {
+                id: clipPlanes
+
+                // Left plane
+                Model {
+                    id: leftPlane
+                    source: "#Rectangle"
+                    scale: Qt.vector3d(2, 20, 2)  // thin X-axis oriented plane
+                    position: Qt.vector3d(0, 0, -61)
+                    materials: PrincipledMaterial {
+                        baseColor: "#aaffff" // light cyan for visibility
+                        opacity: 0.3
+                        roughness: 0.1
+                        metalness: 0.0
+                        cullMode: Material.NoCulling
+                    }
+                }
+
+                // Right plane
+                Model {
+                    id: rightPlane
+                    source: "#Rectangle"
+                    scale: Qt.vector3d(2, 20, 2)
+                    position: Qt.vector3d(0, 0, 61)
+                    materials: PrincipledMaterial {
+                        baseColor: "#aaffff"
+                        opacity: 0.3
+                        roughness: 0.1
+                        metalness: 0.0
+                        cullMode: Material.NoCulling
+                    }
+                }
+            }
         }
     }
 
@@ -141,7 +195,7 @@ Item {
 
         onClicked: {
             let box = threeDSpaceView.getNewBox();
-            spawnBoxInQML(box.position, box.scaleFactor);
+            spawnBoxInQML(box.position, box.scaleFactor, box.dimensions);
         }
     }
 
@@ -150,20 +204,61 @@ Item {
         threeDSpaceView.rotationDelta = rotationDelta;
     }
 
-    function spawnBoxInQML(position, scale) {
+    function spawnBoxInQML(position, scale, dimensions) {
         // TODO: remove, for debugging only
-        console.log("Spawning box at", position, "with scale", scale);
+        console.log("Spawning box at", position, "with scale", scale, "with dimensions", dimensions);
         var component = Qt.createComponent(boxSource);
         if (component.status === Component.Ready) {
             var box = component.createObject(shapeSpawner, {
                 "position": position,
-                "scale": scale
+                "scale": scale,
+                "dimensions": dimensions
             });
-            if (!box) {
+
+            if (box) {
+                spawnedBoxes.push(box);
+            } else {
                 console.error("Failed to create box");
             }
         } else {
             console.error("Box component error:", component.errorString());
+        }
+    }
+
+    function checkCollisions() {
+        function checkBoxPlaneCollision(planeZ, box, positiveDirection) {
+            const halfDepth = box.dimensions.z * box.scale.z * 0.5;
+
+            // Checking if left plane has touched the left side of the box
+            if (positiveDirection) {
+                const boxMinZ = box.position.z - halfDepth;
+                return planeZ >= boxMinZ;
+            }
+
+            // Checking if right plane has touched the right side of the box
+            const boxMaxZ = box.position.z + halfDepth;
+            return planeZ <= boxMaxZ;
+        }
+
+        for (let i = 0; i < spawnedBoxes.length; ++i) {
+            let box = spawnedBoxes[i];
+
+            let leftHit = checkBoxPlaneCollision(leftPlane.position.z, box, true);
+            let rightHit = checkBoxPlaneCollision(rightPlane.position.z, box, false);
+
+            if (leftHit) {
+                console.log("Box", i, "collided with LEFT plane");
+            }
+
+            if (rightHit) {
+                console.log("Box", i, "collided with RIGHT plane");
+            }
+
+            if (leftHit || rightHit) {
+                box.visible = false;
+            } else {
+                box.visible = true;
+            }
         }
     }
 

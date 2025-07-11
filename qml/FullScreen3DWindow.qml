@@ -45,6 +45,9 @@ Window {
         zoomMin: zoomSlider.from
         zoomMax: zoomSlider.to
 
+        slideLeft: viewSlider.first.value
+        slideRight: viewSlider.second.value
+
         onZoomLevelChanged: {
             zoomSlider.value = zoomLevel;
         }
@@ -84,7 +87,7 @@ Window {
             height: 40
             wheelEnabled: false
             first.value: settingsBridge.viewSliderFirst
-            second.value: settingsBridge.viewSliderSecond
+            second.value: settingsBridge.viewSliderSecond``
             from: 0
             to: 100
             stepSize: 1
@@ -99,12 +102,12 @@ Window {
             Layout.alignment: Qt.AlignLeft
 
             Text {
-                text: qsTr("Front: %1%").arg(viewSlider.first.value)
+                text: qsTr("Front: %1%").arg(viewSlider.first.value.toFixed(1))
                 font.pixelSize: 14
             }
 
             Text {
-                text: qsTr("Back: %1%").arg(viewSlider.second.value)
+                text: qsTr("Back: %1%").arg(viewSlider.second.value.toFixed(1))
                 font.pixelSize: 14
             }
         }

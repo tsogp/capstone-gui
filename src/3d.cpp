@@ -46,9 +46,8 @@ BoxData ThreeDSpaceView::getNewBox() {
     QVector3D position(xVal, yVal, 35);
     QVector3D rotation(0, 0, 0);
     QVector3D scaleFactor(scale, scale, scale);
-    QVector3D dimensions(100, 100, 100);
 
-    BoxData newBox(dimensions, position, rotation, scaleFactor);
+    BoxData newBox(position, rotation, scaleFactor);
     m_boxes.push(newBox);
 
     return newBox;
