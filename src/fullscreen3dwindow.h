@@ -15,7 +15,8 @@ class FullScreen3DWindow : public QObject {
     Q_PROPERTY(
         float viewSliderSecond READ viewSliderSecond WRITE setViewSliderSecond NOTIFY viewSliderSecondChanged FINAL)
     Q_PROPERTY(bool isAutoMode READ isAutoMode WRITE setIsAutoMode NOTIFY isAutoModeChanged FINAL)
-
+    Q_PROPERTY(bool viewSlicingEnabled READ viewSlicingEnabled WRITE setViewSlicingEnabled NOTIFY
+                   viewSlicingEnabledChanged FINAL)
 public:
     FullScreen3DWindow(QQmlEngine *engine, QQmlContext *contextPtr, QObject *parent = nullptr);
     void show(const QString &data);
@@ -35,6 +36,11 @@ public:
     }
     void setIsAutoMode(bool value);
 
+    bool viewSlicingEnabled() const {
+        return m_viewSlicingEnabled;
+    }
+    void setViewSlicingEnabled(bool value);
+
     void setThreeDView(std::unique_ptr<ThreeDSpaceView> view) {
         m_3dView = std::move(view);
     }
@@ -49,6 +55,7 @@ signals:
     void viewSliderFirstChanged();
     void viewSliderSecondChanged();
     void isAutoModeChanged();
+    void viewSlicingEnabledChanged();
 
 private:
     QPointer<QQuickWindow> m_window;
@@ -59,6 +66,7 @@ private:
     float m_viewSliderFirst = 0;
     float m_viewSliderSecond = 100;
     bool m_isAutoMode = false;
+    bool m_viewSlicingEnabled = false;
 
     void writeSettings();
     void readSettings();

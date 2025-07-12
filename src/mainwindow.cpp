@@ -73,6 +73,7 @@ void MainWindow::updatePalletInfo(const QString &name) {
     for (const QJsonValue &value : palletArray) {
         QJsonObject obj = value.toObject();
         if (obj["type"].toString().toLower().contains(name.toLower())) {
+            m_3dView->setZLength(obj["zLength"].toDouble());
             m_3dView->setCurrentModelSource(name);
             QString info = QString("Pallet type: %1\nDimension: %2\nLoad-bearing capacity: %3\nExtra load: %4\nDead "
                                    "load: %5\nStandard: %6\nApplication: %7")

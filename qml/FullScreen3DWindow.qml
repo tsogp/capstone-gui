@@ -30,12 +30,19 @@ Window {
         function onIsAutoModeChanged() {
             autoModeToggle.checked = settingsBridge.isAutoMode;
         }
+
+        function onViewSlicingEnabledChanged() {
+            viewSlicingEnabled.checked = settingsBridge.viewSlicingEnabled;
+            console.log("connections", settingsBridge.viewSlicingEnabled);
+        }
     }
 
     Component.onCompleted: {
         viewSlider.first.value = settingsBridge.viewSliderFirst;
         viewSlider.second.value = settingsBridge.viewSliderSecond;
         autoModeToggle.checked = settingsBridge.isAutoMode;
+        viewSlicingEnabled.checked = settingsBridge.viewSlicingEnabled;
+        console.log("connected", settingsBridge.viewSlicingEnabled);
     }
 
     ThreeDView {
@@ -47,6 +54,9 @@ Window {
 
         slideLeft: viewSlider.first.value
         slideRight: viewSlider.second.value
+
+        fromFullScreen: true
+        viewSlicingEnabled: viewSlicingEnabled.checked
 
         onZoomLevelChanged: {
             zoomSlider.value = zoomLevel;
@@ -75,6 +85,17 @@ Window {
         anchors.topMargin: 20
         spacing: 5
 
+        CheckBox {
+            id: viewSlicingEnabled
+            objectName: "viewSlicingEnabled"
+            checked: settingsBridge.viewSlicingEnabled
+            font.pointSize: 12
+            text: checked ? qsTr("View Slicing enabled") : qsTr("View Slicing disabled")
+            leftPadding: 0
+            
+            onCheckedChanged: settingsBridge.viewSlicingEnabled = checked
+        }
+
         Text {
             text: qsTr("View Slicer")
             font.pixelSize: 17
@@ -87,7 +108,8 @@ Window {
             height: 40
             wheelEnabled: false
             first.value: settingsBridge.viewSliderFirst
-            second.value: settingsBridge.viewSliderSecond``
+            second.value: settingsBridge.viewSliderSecond
+            enabled: viewSlicingEnabled.checked
             from: 0
             to: 100
             stepSize: 1

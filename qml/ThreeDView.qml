@@ -20,29 +20,42 @@ Item {
     property vector3d palletRotation: Qt.vector3d(15, 70, 30)
     property string currentModelSource: "qrc:/FullScreen3DView/assets/models/eur/EuroPallet.qml"
     property string boxSource: "qrc:/FullScreen3DView/assets/models/box/CartonBox.qml"
+    property real zLength: 0.0
 
     property real slideLeft: 0.0
     property real slideRight: 0.0
 
     property var spawnedBoxes: []
+    property bool fromFullScreen: false
+
+    property bool viewSlicingEnabled: false
 
     onSlideLeftChanged: {
-        const zMin = -61;
-        const zMax = 61;
-        leftPlane.position.z = zMin + (zMax - zMin) * (slideLeft / 100);
-        checkCollisions();
+        moveSlicePlane(true);
     }
 
     onSlideRightChanged: {
-        const zMax = 61;
-        const zMin = -61;
-        rightPlane.position.z = zMax - (zMax - zMin) * (1 - slideRight / 100);
-        checkCollisions();
+        moveSlicePlane(false);
+    }
+
+    onViewSlicingEnabledChanged: {
+        // Can only be changed when the fullscreen is opened
+        if (fromFullScreen) {
+            if (!viewSlicingEnabled) {
+                for (let i = 0; i < spawnedBoxes.length; ++i) {
+                    spawnedBoxes[i].visible = true;
+                }
+            } else {
+                moveSlicePlane(true);
+                moveSlicePlane(false);
+            }
+        }
     }
 
     Component.onCompleted: {
         rotationDelta = threeDSpaceView.rotationDelta;
         zoomLevel = threeDSpaceView.zoomLevel;
+        zLength = threeDSpaceView.zLength;
 
         applyRotationToAll();
         applyZoomToAll();
@@ -50,8 +63,22 @@ Item {
         let boxes = threeDSpaceView.getBoxes();
         for (let i = 0; i < boxes.length; ++i) {
             spawnBoxInQML(boxes[i].position, boxes[i].scaleFactor, boxes[i].dimensions);
+
+            if (!fromFullScreen || !viewSlicingEnabled) {
+                boxes[i].visible = true;
+            }
         }
-        spawnedBoxes = boxes;
+
+        if (fromFullScreen) {
+            moveSlicePlane(true);
+            moveSlicePlane(false);
+        }
+    }
+
+    Component.onDestruction: {
+        // TODO BUG: currently if the component is opened from fullscreen,
+        // is it not destroyed until the whole program is closed
+        console.log("destroyed");
     }
 
     Connections {
@@ -63,6 +90,10 @@ Item {
 
         function onZoomLevelChanged() {
             zoomLevel = threeDSpaceView.zoomLevel;
+        }
+
+        function onZLengthChanged() {
+            zLength = threeDSpaceView.zLength;
         }
     }
 
@@ -153,7 +184,8 @@ Item {
                     id: leftPlane
                     source: "#Rectangle"
                     scale: Qt.vector3d(2, 20, 2)  // thin X-axis oriented plane
-                    position: Qt.vector3d(0, 0, -61)
+                    position: Qt.vector3d(0, 0, -(zLength / 2))
+                    visible: viewSlicingEnabled && fromFullScreen
                     materials: PrincipledMaterial {
                         baseColor: "#aaffff" // light cyan for visibility
                         opacity: 0.3
@@ -168,7 +200,8 @@ Item {
                     id: rightPlane
                     source: "#Rectangle"
                     scale: Qt.vector3d(2, 20, 2)
-                    position: Qt.vector3d(0, 0, 61)
+                    position: Qt.vector3d(0, 0, zLength / 2)
+                    visible: viewSlicingEnabled && fromFullScreen
                     materials: PrincipledMaterial {
                         baseColor: "#aaffff"
                         opacity: 0.3
@@ -197,6 +230,18 @@ Item {
             let box = threeDSpaceView.getNewBox();
             spawnBoxInQML(box.position, box.scaleFactor, box.dimensions);
         }
+    }
+
+    function moveSlicePlane(left) {
+        const zMin = -(zLength / 2);
+        const zMax = (zLength / 2);
+
+        if (left) {
+            leftPlane.position.z = zMin + (zMax - zMin) * (slideLeft / 100);
+        } else {
+            rightPlane.position.z = zMax - (zMax - zMin) * (1 - slideRight / 100);
+        }
+        checkCollisions();
     }
 
     function applyRotationToAll() {
@@ -245,14 +290,6 @@ Item {
 
             let leftHit = checkBoxPlaneCollision(leftPlane.position.z, box, true);
             let rightHit = checkBoxPlaneCollision(rightPlane.position.z, box, false);
-
-            if (leftHit) {
-                console.log("Box", i, "collided with LEFT plane");
-            }
-
-            if (rightHit) {
-                console.log("Box", i, "collided with RIGHT plane");
-            }
 
             if (leftHit || rightHit) {
                 box.visible = false;

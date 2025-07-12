@@ -75,6 +75,7 @@ Window {
                                 id: threeDViewComponent
                                 ThreeDView {
                                     id: halfScreenView
+                                    fromFullScreen: false
                                 }
                             }
                         }
