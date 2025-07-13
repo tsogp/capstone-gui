@@ -3,7 +3,6 @@
 
 #include "3d.h"
 #include "fullscreen3dwindow.h"
-#include "box.cpp"
 #include <QJsonArray>
 #include <QObject>
 #include <QPointer>
@@ -20,7 +19,7 @@ class MainWindow : public QQmlApplicationEngine {
 public slots:
     void openFullScreen3DWindow(const QString &message);
     void updatePalletInfo(const QString &name);
-    void processJsonFile(const QUrl &fileUrl);
+    void processBoxesJsonFile(const QUrl &fileUrl);
     QString getRawJson() const;
     QString getValidBoxesSummary() const;
     QString getInvalidBoxesSummary() const;
@@ -31,7 +30,7 @@ public:
 
     void loadMainQml();
     bool isFullScreenViewOpen() const { return m_isFullScreenViewOpen; }
-    const QVector<Box> &boxes() const { return m_boxes;}
+    const QVector<BoxData> &boxes() const { return m_boxes;}
     QString jsonErrorMessage() const { return m_jsonErrorMessage;}
 
 signals:
@@ -49,7 +48,7 @@ private:
     QPointer<FullScreen3DWindow> m_secondWindow;
     QJsonArray palletArray;
     bool m_isFullScreenViewOpen = false;
-    QVector<Box> m_boxes;
+    QVector<BoxData> m_boxes;
     QList<QString> m_invalidBoxes;
     QString m_rawJson;
     QString m_jsonErrorMessage;

@@ -231,7 +231,7 @@ Window {
                             fileMode: FileDialog.OpenFile
                             onAccepted: {
                                 console.log("Selected file:", fileDialog.selectedFile)
-                                mainWindow.processJsonFile(fileDialog.selectedFile)
+                                mainWindow.processBoxesJsonFile(fileDialog.selectedFile)
                             }
                         }
 

@@ -100,12 +100,12 @@ QString MainWindow::getValidBoxesSummary() const {
     QString summary;
     for (const auto &box : m_boxes) {
         summary += QString("Box %1: %2x%3x%4, weight %5, maxLoad %6\n")
-                       .arg(box.id)
-                       .arg(box.w)
-                       .arg(box.l)
-                       .arg(box.h)
-                       .arg(box.weight)
-                       .arg(box.maxLoad);
+                       .arg(box.m_id)
+                       .arg(box.m_dimensions.y())
+                       .arg(box.m_dimensions.x())
+                       .arg(box.m_dimensions.z())
+                       .arg(box.m_weight)
+                       .arg(box.m_maxLoad);
     }
     return summary;
 }
@@ -121,7 +121,7 @@ QString MainWindow::getInvalidBoxesSummary() const {
     return summary;
 }
 
-void MainWindow::processJsonFile(const QUrl &fileUrl) {
+void MainWindow::processBoxesJsonFile(const QUrl &fileUrl) {
     QString path = fileUrl.toLocalFile();
 
     auto fail = [&](const QString &msg) {
@@ -160,7 +160,7 @@ void MainWindow::processJsonFile(const QUrl &fileUrl) {
 
     
     QJsonArray boxArray = root["boxes"].toArray();
-    QVector<Box> parsedBoxes;
+    QVector<BoxData> parsedBoxes;
     QList<QString> invalidBoxes;
 
     for (const QJsonValue &val : boxArray) {
@@ -178,13 +178,13 @@ void MainWindow::processJsonFile(const QUrl &fileUrl) {
             continue;
         }
 
-        Box b;
-        b.id = obj["id"].toInt();
-        b.w = obj["w"].toInt();
-        b.l = obj["l"].toInt();
-        b.h = obj["h"].toInt();
-        b.weight = obj["weight"].toDouble();
-        b.maxLoad = obj["max_load"].toInt();
+        BoxData b;
+        b.m_id = obj["id"].toInt();
+        b.m_dimensions.setY(obj["w"].toDouble());
+        b.m_dimensions.setX(obj["l"].toDouble());
+        b.m_dimensions.setZ(obj["h"].toDouble());
+        b.m_weight = obj["weight"].toDouble();
+        b.m_maxLoad = obj["max_load"].toInt();
         parsedBoxes.append(b);
     }
 
