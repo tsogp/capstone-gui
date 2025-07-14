@@ -22,12 +22,16 @@ QString ThreeDSpaceView::currentModelSource() const {
     return m_currentModelSource;
 }
 
-QVariantList ThreeDSpaceView::getBoxes() {
-    QVariantList list(m_boxes.size());
-    for (int i = 0; i < m_boxes.size(); ++i) {
-        list[i] = QVariant::fromValue(m_boxes.at(i));
+QVariantList ThreeDSpaceView::getSpawnedBoxes() {
+    QVariantList list(m_spawnedBoxes.size());
+    for (int i = 0; i < m_spawnedBoxes.size(); ++i) {
+        list[i] = QVariant::fromValue(m_spawnedBoxes.at(i));
     }
     return list;
+}
+
+void ThreeDSpaceView::setBoxes(const QVector<BoxData> &boxes) {
+    m_boxes = boxes;
 }
 
 BoxData ThreeDSpaceView::getNewBox() {
@@ -40,10 +44,14 @@ BoxData ThreeDSpaceView::getNewBox() {
     QVector3D position(xVal, yVal, 35);
     QVector3D rotation(0, 0, 0);
     QVector3D scaleFactor(scale, scale, scale);
-    QVector3D dimensions(100, 100, 100);
-
-    BoxData newBox(dimensions, position, rotation, scaleFactor);
-    m_boxes.push(newBox);
+    
+    //TODO: after algo integration, these variables should not need to be assigned
+    BoxData newBox = m_boxes.at(m_currentBoxId);
+    newBox.m_position = position;
+    newBox.m_rotation = rotation;
+    newBox.m_scaleFactor = scaleFactor;
+    m_spawnedBoxes.push(newBox);
+    m_currentBoxId++; // Increment for next box
 
     return newBox;
 }

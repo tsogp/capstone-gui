@@ -21,6 +21,17 @@ Window {
         function onPalletInfoUpdated(info) {
             txtPalletInfo.text = info;
         }
+
+        function onSimulationStarted(){
+            choicesColLayout.visible = false;
+            rowButtons.visible = false;
+            txtBoxInfo.visible = true;
+            txtBoxInfo.text = qsTr("Simulation started. Click on boxes to interact with them.");
+        }
+
+        function onBoxInfoUpdated(info) {
+            txtBoxInfo.text = info;
+        }
     }
 
     Rectangle {
@@ -122,8 +133,8 @@ Window {
                     anchors.centerIn: parent
                     Layout.alignment: Qt.AlignTop
 
-                    TextArea {
-                        id: txtaInfo
+                    Text {
+                        id: txtBoxInfo
                         color: "#000000"
                         text: "Currently placing {box.name}\n\nPlacement data:\n- x = {box.x}\n- y = {box.y}\n- z = {box.z}\n- Weight = {box.weight}\n- Max load capacity: {box.max_load_capacity}\n- Estimated load: {box.estiomated_load}"
                         font.pixelSize: 16
@@ -282,6 +293,9 @@ Window {
                             Layout.preferredHeight: 40
                             text: qsTr("Start simulation")
                             font.pixelSize: 16
+                            onClicked: {
+                                mainWindow.startSimulation();
+                            }
                         }
                     }
                 }

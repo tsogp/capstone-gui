@@ -23,16 +23,19 @@ public slots:
 
 public:
     explicit ThreeDSpaceView(QQmlContext *contextPtr, QObject *parent = nullptr);
+    void setBoxes(const QVector<BoxData> &boxes);
 
 public slots:
     BoxData getNewBox();
-    QVariantList getBoxes();
+    QVariantList getSpawnedBoxes();
 signals:
     void currentModelSourceChanged(const QString &src);
 
 private:
-    QStack<BoxData> m_boxes;
+    QVector<BoxData> m_boxes;
+    QStack<BoxData> m_spawnedBoxes;
     QString m_currentModelSource;
+    int m_currentBoxId = 0; // Reference for new boxes
 };
 
 #endif // __3D_H__

@@ -15,6 +15,7 @@ class MainWindow : public QQmlApplicationEngine {
     Q_PROPERTY(bool isFullScreenViewOpen READ isFullScreenViewOpen NOTIFY isFullScreenViewOpenChanged)
     Q_PROPERTY(QString jsonErrorMessage READ jsonErrorMessage NOTIFY jsonErrorMessageChanged)
     Q_PROPERTY(bool isJsonLoaded READ isJsonLoaded NOTIFY isJsonLoadedChanged)
+    Q_PROPERTY(bool hasSimulationStarted READ hasSimulationStarted NOTIFY simulationStarted)
 
 public slots:
     void openFullScreen3DWindow(const QString &message);
@@ -24,6 +25,9 @@ public slots:
     QString getValidBoxesSummary() const;
     QString getInvalidBoxesSummary() const;
     bool isJsonLoaded() const;
+    void startSimulation();
+    bool hasSimulationStarted() const;
+    void updateBoxInfo(const int &boxId);
 
 public:
     MainWindow();
@@ -38,6 +42,8 @@ signals:
     void isFullScreenViewOpenChanged();
     void jsonErrorMessageChanged();
     void isJsonLoadedChanged();
+    void simulationStarted();
+    void boxInfoUpdated(const QString &boxInfo);
 
 private slots:
     void onFullScreen3DWindowClosed();
@@ -53,6 +59,7 @@ private:
     QString m_rawJson;
     QString m_jsonErrorMessage;
     bool m_isJsonLoaded = false;
+    bool m_hasSimulationStarted = false;
 
     void loadPalletsJson();
 };

@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "3d.h"
+#include "boxdata.h"
 #include "fullscreen3dwindow.h"
 #include <QDebug>
 #include <QFile>
@@ -201,6 +202,30 @@ void MainWindow::processBoxesJsonFile(const QUrl &fileUrl) {
 
 bool MainWindow::isJsonLoaded() const {
     return m_isJsonLoaded;
+}
+
+void MainWindow::startSimulation() {
+    m_3dView->setBoxes(m_boxes);
+    m_hasSimulationStarted = true;
+    emit simulationStarted();
+}
+
+bool MainWindow::hasSimulationStarted() const {
+    return m_hasSimulationStarted;
+}
+
+void MainWindow::updateBoxInfo(const int &boxId) {
+    // TODO: Finishing touches to display more detailed box info in the UI
+    qDebug() << DEBUG_PREFIX << "Box info updated for ID:" << boxId;
+    BoxData box = m_boxes.at(boxId);
+    QString info = QString("Box %1: %2x%3x%4, weight %5, maxLoad %6")
+                       .arg(box.m_id)
+                       .arg(box.m_dimensions.y())
+                       .arg(box.m_dimensions.x())
+                       .arg(box.m_dimensions.z())
+                       .arg(box.m_weight)
+                       .arg(box.m_maxLoad);
+    emit boxInfoUpdated(info);
 }
 
 void MainWindow::onFullScreen3DWindowClosed() {

@@ -18,9 +18,9 @@ Item {
     property string boxSource: "qrc:/FullScreen3DView/assets/models/box/CartonBox.qml"
 
     Component.onCompleted: {
-        let boxes = threeDSpaceView.getBoxes();
+        let boxes = threeDSpaceView.getSpawnedBoxes();
         for (let i = 0; i < boxes.length; ++i) {
-            spawnBoxInQML(boxes[i].position, palletRotation, boxes[i].scaleFactor);
+            spawnBoxInQML(boxes[i].position, palletRotation, boxes[i].scaleFactor, boxes[i].id);
         }
     }
 
@@ -28,12 +28,36 @@ Item {
         id: view3D
         anchors.fill: parent
 
+        property var selectedBox: null
+
         environment: SceneEnvironment {
             id: sceneEnvironment
             clearColor: "white"
             backgroundMode: SceneEnvironment.Color
             antialiasingMode: SceneEnvironment.MSAA
             antialiasingQuality: SceneEnvironment.High
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            onClicked: function(mouse) {
+                var result = view3D.pick(mouse.x, mouse.y);
+
+                if (result.objectHit) {
+                    var pickedModel = result.objectHit;
+                    var boxNode = pickedModel.parent;
+
+                    // Deselect previously selected box
+                    if (view3D.selectedBox && view3D.selectedBox !== boxNode) {
+                        view3D.selectedBox.model.isPicked = false;
+                    }
+
+                    // Mark the new box as selected
+                    pickedModel.isPicked = true;
+                    view3D.selectedBox = boxNode;
+                    mainWindow.updateBoxInfo(boxNode.boxId);
+                }
+            }
         }
 
         PerspectiveCamera {
@@ -86,11 +110,12 @@ Item {
 
         onClicked: {
             let box = threeDSpaceView.getNewBox();
-            spawnBoxInQML(box.position, palletRotation, box.scaleFactor);
+            spawnBoxInQML(box.position, palletRotation, box.scaleFactor, box.id);
+            console.log("Box spawned with ID:", box.id, "Weight:", box.weight, "Max Load:", box.maxLoad);
         }
     }
 
-    function spawnBoxInQML(position, rotation, scale) {
+    function spawnBoxInQML(position, rotation, scale, id) {
         // TODO: remove, for debugging only
         console.log("Spawning box at", position, "with rotation", rotation, "with scale", scale);
         var component = Qt.createComponent(boxSource);
@@ -98,7 +123,8 @@ Item {
             var box = component.createObject(shapeSpawner, {
                 "position": position,
                 "eulerRotation": rotation,
-                "scale": scale
+                "scale": scale,
+                "boxId": id
             });
             if (!box) {
                 console.error("Failed to create box");
