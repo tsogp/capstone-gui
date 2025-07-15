@@ -4,6 +4,9 @@ import QtQuick3D
 Node {
     id: cartonBox
     property vector3d dimensions: Qt.vector3d(0, 0, 0)
+    property int animationDuration: 1000
+    property real animStartY
+    property real animEndY
 
     Model {
         id: cartonBoxModel
@@ -18,5 +21,14 @@ Node {
                 indexOfRefraction: 1
             }
         ]
+
+        SequentialAnimation on y {
+            NumberAnimation {
+                duration: animationDuration
+                to: cartonBox.animEndY
+                from: cartonBox.animStartY
+                easing.type: Easing.InQuad
+            }
+        }
     }
 }

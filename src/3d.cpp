@@ -42,12 +42,16 @@ QVariantList ThreeDSpaceView::getBoxes() {
 
 BoxData ThreeDSpaceView::getNewBox() {
     // TODO: create actual spwaning logic with collision detection
-    int xVal = QRandomGenerator::global()->bounded(0, 20);
-    int yVal = QRandomGenerator::global()->bounded(0, 20);
-    int zVal = QRandomGenerator::global()->bounded(0, 20);
-    double scale = std::max(1.0, QRandomGenerator::global()->generateDouble() * 3.0);
+    double xHalf = static_cast<double>(m_palletData.x() / 2);
+    double zHalf = static_cast<double>(m_palletData.z() / 2);
+    
+    // Random value in range [-xHalf, +xHalf]
+    double xVal = (QRandomGenerator::global()->generateDouble() * 2.0 - 1.0) * xHalf;
+    double zVal = (QRandomGenerator::global()->generateDouble() * 2.0 - 1.0) * zHalf;
+    // double scale = std::max(1.0, QRandomGenerator::global()->generateDouble() * 3.0);
+    double scale = 1.0f;
 
-    QVector3D position(xVal, yVal, 35);
+    QVector3D position(xVal, -m_palletData.y(), zVal);
     QVector3D rotation(0, 0, 0);
     QVector3D scaleFactor(scale, scale, scale);
 

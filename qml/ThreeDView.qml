@@ -20,7 +20,7 @@ Item {
     property vector3d palletRotation: Qt.vector3d(15, 70, 30)
     property string currentModelSource: "qrc:/FullScreen3DView/assets/models/eur/EuroPallet.qml"
     property string boxSource: "qrc:/FullScreen3DView/assets/models/box/CartonBox.qml"
-    property real zLength: 0.0
+    property vector3d palletData
 
     property real slideLeft: 0.0
     property real slideRight: 0.0
@@ -55,7 +55,7 @@ Item {
     Component.onCompleted: {
         rotationDelta = threeDSpaceView.rotationDelta;
         zoomLevel = threeDSpaceView.zoomLevel;
-        zLength = threeDSpaceView.zLength;
+        palletData = threeDSpaceView.palletData;
 
         applyRotationToAll();
         applyZoomToAll();
@@ -92,8 +92,8 @@ Item {
             zoomLevel = threeDSpaceView.zoomLevel;
         }
 
-        function onZLengthChanged() {
-            zLength = threeDSpaceView.zLength;
+        function onPalletDataChanged() {
+            palletData = threeDSpaceView.palletData;
         }
     }
 
@@ -184,7 +184,7 @@ Item {
                     id: leftPlane
                     source: "#Rectangle"
                     scale: Qt.vector3d(2, 20, 2)  // thin X-axis oriented plane
-                    position: Qt.vector3d(0, 0, -(zLength / 2))
+                    position: Qt.vector3d(0, 0, -(palletData.z / 2))
                     visible: viewSlicingEnabled && fromFullScreen
                     materials: PrincipledMaterial {
                         baseColor: "#aaffff" // light cyan for visibility
@@ -200,7 +200,7 @@ Item {
                     id: rightPlane
                     source: "#Rectangle"
                     scale: Qt.vector3d(2, 20, 2)
-                    position: Qt.vector3d(0, 0, zLength / 2)
+                    position: Qt.vector3d(0, 0, palletData.z / 2)
                     visible: viewSlicingEnabled && fromFullScreen
                     materials: PrincipledMaterial {
                         baseColor: "#aaffff"
@@ -233,8 +233,8 @@ Item {
     }
 
     function moveSlicePlane(left) {
-        const zMin = -(zLength / 2);
-        const zMax = (zLength / 2);
+        const zMin = -(palletData.z / 2);
+        const zMax = (palletData.z / 2);
 
         if (left) {
             leftPlane.position.z = zMin + (zMax - zMin) * (slideLeft / 100);
@@ -257,7 +257,9 @@ Item {
             var box = component.createObject(shapeSpawner, {
                 "position": position,
                 "scale": scale,
-                "dimensions": dimensions
+                "dimensions": dimensions,
+                "animStartY": 150,
+                "animEndY": position.y
             });
 
             if (box) {

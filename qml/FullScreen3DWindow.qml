@@ -33,7 +33,6 @@ Window {
 
         function onViewSlicingEnabledChanged() {
             viewSlicingEnabled.checked = settingsBridge.viewSlicingEnabled;
-            console.log("connections", settingsBridge.viewSlicingEnabled);
         }
     }
 
@@ -42,7 +41,6 @@ Window {
         viewSlider.second.value = settingsBridge.viewSliderSecond;
         autoModeToggle.checked = settingsBridge.isAutoMode;
         viewSlicingEnabled.checked = settingsBridge.viewSlicingEnabled;
-        console.log("connected", settingsBridge.viewSlicingEnabled);
     }
 
     ThreeDView {
