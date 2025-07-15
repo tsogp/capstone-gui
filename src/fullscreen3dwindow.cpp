@@ -74,6 +74,7 @@ void FullScreen3DWindow::show(const QString &data) {
 
     QQmlComponent component(m_engine.data(), QUrl(FULLSCREEN3DWINDOW_URL));
     QObject *object = component.create(m_parentContext.data());
+    object->setParent(this);
 
     if (!object) {
         qWarning() << DEBUG_PREFIX << "Failed to load " << FULLSCREEN3DWINDOW_URL << ":" << component.errors();
@@ -95,5 +96,4 @@ void FullScreen3DWindow::show(const QString &data) {
 void FullScreen3DWindow::onWindowClosed() {
     writeSettings();
     emit closed();
-    m_window.clear();
 }

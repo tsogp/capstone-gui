@@ -21,6 +21,8 @@ MainWindow::MainWindow() {
     m_context = rootContext();
     m_context->setContextProperty("mainWindow", this);
 
+    qDebug() << DEBUG_PREFIX << "In constructor";
+
     m_secondWindow = new FullScreen3DWindow(this, m_context, this);
     m_3dView = std::make_unique<ThreeDSpaceView>(m_context, m_context);
 
@@ -39,6 +41,11 @@ void MainWindow::openFullScreen3DWindow(const QString &message) {
     qDebug() << DEBUG_PREFIX << "Full Screen 3D View opened.";
     m_isFullScreenViewOpen = true;
     emit isFullScreenViewOpenChanged();
+
+    if (m_secondWindow == nullptr) {
+        m_secondWindow = new FullScreen3DWindow(this, m_context, this);
+        connect(m_secondWindow, &FullScreen3DWindow::closed, this, &MainWindow::onFullScreen3DWindowClosed);
+    }
 
     m_secondWindow->setThreeDView(std::move(m_3dView));
     m_secondWindow->show(message);
@@ -96,6 +103,9 @@ void MainWindow::updatePalletInfo(const QString &name) {
 void MainWindow::onFullScreen3DWindowClosed() {
     if (m_secondWindow) {
         m_3dView = std::move(m_secondWindow->takeThreeDView());
+
+        m_secondWindow->deleteLater();
+        m_secondWindow = nullptr;
     }
 
     qDebug() << DEBUG_PREFIX << "Full Screen 3D View closed.";
