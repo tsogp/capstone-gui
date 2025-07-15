@@ -9,7 +9,9 @@
             "dead_load": "25 kg",
             "technical_standard": "UIC data sheet 435-2",
             "application": "Exchange pallet",
-            "zLength": 80
+            "zLength": 80,
+            "xLength": 120,
+            "yLength": 14.4
         },
         {
             "id": 2,
@@ -20,7 +22,9 @@
             "dead_load": "30 kg",
             "technical_standard": "UIC data sheet 435-5",
             "application": "Exchange pallet",
-            "zLength": 100
+            "zLength": 100,
+            "xLength": 120,
+            "yLength": 18.2
         },
         {
             "id": 3,
@@ -31,7 +35,9 @@
             "dead_load": "30 kg",
             "technical_standard": "not available in the UIC programme",
             "application": "Export",
-            "zLength": 110
+            "zLength": 110,
+            "xLength": 110,
+            "yLength": 14.4
         }
     ]
 }

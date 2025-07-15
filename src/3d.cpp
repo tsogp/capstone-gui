@@ -28,8 +28,8 @@ QVector2D ThreeDSpaceView::rotationDelta() const {
     return m_rotationDelta;
 }
 
-float ThreeDSpaceView::zLength() const {
-    return m_zLength;
+QVector3D ThreeDSpaceView::palletData() const {
+    return m_palletData;
 }
 
 QVariantList ThreeDSpaceView::getBoxes() {
@@ -102,10 +102,10 @@ void ThreeDSpaceView::setZoomLevel(float value) {
     }
 }
 
-void ThreeDSpaceView::setZLength(float zLength) {
-    if (m_zLength != zLength) {
-        m_zLength = zLength;
-        emit zLengthChanged();
+void ThreeDSpaceView::setPalletData(const QVector3D &palletData) {
+    if (m_palletData != palletData) {
+        m_palletData = palletData;
+        emit palletDataChanged();
     }
 }
 

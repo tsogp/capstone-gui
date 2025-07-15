@@ -20,16 +20,16 @@ class ThreeDSpaceView : public QObject {
         QString currentModelSource READ currentModelSource WRITE setCurrentModelSource NOTIFY currentModelSourceChanged)
     Q_PROPERTY(QVector2D rotationDelta READ rotationDelta WRITE setRotationDelta NOTIFY rotationDeltaChanged)
     Q_PROPERTY(float zoomLevel READ zoomLevel WRITE setZoomLevel NOTIFY zoomLevelChanged)
-    Q_PROPERTY(float zLength READ zLength WRITE setZLength NOTIFY zLengthChanged)
+    Q_PROPERTY(QVector3D palletData READ palletData CONSTANT NOTIFY palletDataChanged)
 public slots:
     QString currentModelSource() const;
     QVector2D rotationDelta() const;
     float zoomLevel() const;
-    float zLength() const;
+    QVector3D palletData() const;
     void setCurrentModelSource(const QString &src);
     void setRotationDelta(const QVector2D &rotationDelta);
     void setZoomLevel(float value);
-    void setZLength(float zLength);
+    void setPalletData(const QVector3D &palletData);
 
 public:
     explicit ThreeDSpaceView(QQmlContext *contextPtr, QObject *parent = nullptr);
@@ -42,14 +42,14 @@ signals:
     void currentModelSourceChanged(const QString &src);
     void rotationDeltaChanged();
     void zoomLevelChanged();
-    void zLengthChanged();
+    void palletDataChanged();
 
 private:
     QStack<BoxData> m_boxes;
+    QVector3D m_palletData;
     QString m_currentModelSource;
     QVector2D m_rotationDelta;
     float m_zoomLevel = 1.0;
-    float m_zLength;
 
     void readSettings();
     void writeSettings();
