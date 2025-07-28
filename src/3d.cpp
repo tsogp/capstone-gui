@@ -32,12 +32,16 @@ QVector3D ThreeDSpaceView::palletData() const {
     return m_palletData;
 }
 
-QVariantList ThreeDSpaceView::getBoxes() {
-    QVariantList list(m_boxes.size());
-    for (int i = 0; i < m_boxes.size(); ++i) {
-        list[i] = QVariant::fromValue(m_boxes.at(i));
+QVariantList ThreeDSpaceView::getSpawnedBoxes() {
+    QVariantList list(m_spawnedBoxes.size());
+    for (int i = 0; i < m_spawnedBoxes.size(); ++i) {
+        list[i] = QVariant::fromValue(m_spawnedBoxes.at(i));
     }
     return list;
+}
+
+void ThreeDSpaceView::setBoxes(const QVector<BoxData> &boxes) {
+    m_boxes = boxes;
 }
 
 BoxData ThreeDSpaceView::getNewBox() {
@@ -54,9 +58,10 @@ BoxData ThreeDSpaceView::getNewBox() {
     QVector3D position(xVal, -m_palletData.y(), zVal);
     QVector3D rotation(0, 0, 0);
     QVector3D scaleFactor(scale, scale, scale);
-
-    BoxData newBox(position, rotation, scaleFactor);
-    m_boxes.push(newBox);
+    
+    // TODO: after algo integration, these variables should not need to be assigned
+    BoxData newBox = BoxData(m_spawnedBoxes.size(), 12, 12, position, rotation, scaleFactor);
+    m_spawnedBoxes.push(newBox);
 
     return newBox;
 }

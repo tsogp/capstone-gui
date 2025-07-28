@@ -33,11 +33,12 @@ public slots:
 
 public:
     explicit ThreeDSpaceView(QQmlContext *contextPtr, QObject *parent = nullptr);
+    void setBoxes(const QVector<BoxData> &boxes);
     ~ThreeDSpaceView();
 
 public slots:
     BoxData getNewBox();
-    QVariantList getBoxes();
+    QVariantList getSpawnedBoxes();
 signals:
     void currentModelSourceChanged(const QString &src);
     void rotationDeltaChanged();
@@ -45,7 +46,8 @@ signals:
     void palletDataChanged();
 
 private:
-    QStack<BoxData> m_boxes;
+    QVector<BoxData> m_boxes;
+    QStack<BoxData> m_spawnedBoxes;
     QVector3D m_palletData;
     QString m_currentModelSource;
     QVector2D m_rotationDelta;

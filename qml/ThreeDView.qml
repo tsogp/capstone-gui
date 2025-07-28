@@ -60,40 +60,9 @@ Item {
         applyRotationToAll();
         applyZoomToAll();
 
-        let boxes = threeDSpaceView.getBoxes();
+        let boxes = threeDSpaceView.getSpawnedBoxes();
         for (let i = 0; i < boxes.length; ++i) {
-            spawnBoxInQML(boxes[i].position, boxes[i].scaleFactor, boxes[i].dimensions);
-
-            if (!fromFullScreen || !viewSlicingEnabled) {
-                boxes[i].visible = true;
-            }
-        }
-
-        if (fromFullScreen) {
-            moveSlicePlane(true);
-            moveSlicePlane(false);
-        }
-    }
-
-    Component.onDestruction: {
-        // TODO BUG: currently if the component is opened from fullscreen,
-        // is it not destroyed until the whole program is closed
-        console.log("destroyed");
-    }
-
-    Connections {
-        target: threeDSpaceView
-
-        function onRotationDeltaChanged() {
-            rotationDelta = threeDSpaceView.rotationDelta;
-        }
-
-        function onZoomLevelChanged() {
-            zoomLevel = threeDSpaceView.zoomLevel;
-        }
-
-        function onPalletDataChanged() {
-            palletData = threeDSpaceView.palletData;
+            spawnBoxInQML(boxes[i].position, palletRotation, boxes[i].scaleFactor, boxes[i].id);
         }
     }
 
@@ -130,12 +99,41 @@ Item {
         id: view3D
         anchors.fill: parent
 
+        property var selectedBox: null
+
         environment: SceneEnvironment {
             id: sceneEnvironment
             clearColor: "white"
             backgroundMode: SceneEnvironment.Color
             antialiasingMode: SceneEnvironment.MSAA
             antialiasingQuality: SceneEnvironment.High
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            onClicked: function (mouse) {
+                var result = view3D.pick(mouse.x, mouse.y);
+
+                if (result.objectHit) {
+                    var pickedModel = result.objectHit;
+                    var boxNode = pickedModel.parent;
+
+                    // Deselect previously selected box
+                    if (view3D.selectedBox && view3D.selectedBox !== boxNode) {
+                        view3D.selectedBox.model.isPicked = false;
+                    }
+
+                    // Mark the new box as selected
+                    if (pickedModel.isPicked) {
+                        pickedModel.isPicked = false;
+                        view3D.selectedBox = null;
+                    } else {
+                        pickedModel.isPicked = true;
+                        view3D.selectedBox = boxNode;
+                        mainWindow.updateBoxInfo(boxNode.boxId);
+                    }
+                }
+            }
         }
 
         PerspectiveCamera {
@@ -228,7 +226,7 @@ Item {
 
         onClicked: {
             let box = threeDSpaceView.getNewBox();
-            spawnBoxInQML(box.position, box.scaleFactor, box.dimensions);
+            spawnBoxInQML(box.position, box.scaleFactor, box.dimensions, box.id);
         }
     }
 
@@ -249,7 +247,7 @@ Item {
         threeDSpaceView.rotationDelta = rotationDelta;
     }
 
-    function spawnBoxInQML(position, scale, dimensions) {
+    function spawnBoxInQML(position, scale, dimensions, id) {
         // TODO: remove, for debugging only
         console.log("Spawning box at", position, "with scale", scale, "with dimensions", dimensions);
         var component = Qt.createComponent(boxSource);
@@ -259,7 +257,8 @@ Item {
                 "scale": scale,
                 "dimensions": dimensions,
                 "animStartY": 150,
-                "animEndY": position.y
+                "animEndY": position.y,
+                "boxId": id
             });
 
             if (box) {

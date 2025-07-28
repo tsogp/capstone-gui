@@ -7,6 +7,9 @@
 
 class BoxData {
     Q_GADGET
+    Q_PROPERTY(int id MEMBER m_id)
+    Q_PROPERTY(double weight MEMBER m_weight)
+    Q_PROPERTY(int maxLoad MEMBER m_maxLoad)
     Q_PROPERTY(QVector3D dimensions READ dimensions CONSTANT)
     Q_PROPERTY(QVector3D position MEMBER m_position)
     Q_PROPERTY(QVector3D rotation MEMBER m_rotation)
@@ -14,11 +17,16 @@ class BoxData {
 
 public:
     BoxData() = default;
-    BoxData(QVector3D position, QVector3D rotation, QVector3D scaleFactor);
+    BoxData(int id, double weight, int maxLoad, QVector3D position, QVector3D rotation, QVector3D scaleFactor);
+
+    int m_id;
+    double m_weight;
+    int m_maxLoad;
 
     QVector3D m_position;
     QVector3D m_rotation;
     QVector3D m_scaleFactor;
+    QVector3D m_dimensions;
 
     QVector3D dimensions() const;
 };

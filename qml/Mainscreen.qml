@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Window
 import QtQuick.Layouts
 import QtQuick.Controls
+import QtQuick.Dialogs
 
 import QtQuick3D
 import QtQuick3D.Helpers
@@ -19,6 +20,17 @@ Window {
 
         function onPalletInfoUpdated(info) {
             txtPalletInfo.text = info;
+        }
+
+        function onSimulationStarted(){
+            choicesColLayout.visible = false;
+            rowButtons.visible = false;
+            txtBoxInfo.visible = true;
+            txtBoxInfo.text = qsTr("Simulation started. Click on boxes to interact with them.");
+        }
+
+        function onBoxInfoUpdated(info) {
+            txtBoxInfo.text = info;
         }
     }
 
@@ -122,8 +134,8 @@ Window {
                     anchors.centerIn: parent
                     Layout.alignment: Qt.AlignTop
 
-                    TextArea {
-                        id: txtaInfo
+                    Text {
+                        id: txtBoxInfo
                         color: "#000000"
                         text: "Currently placing {box.name}\n\nPlacement data:\n- x = {box.x}\n- y = {box.y}\n- z = {box.z}\n- Weight = {box.weight}\n- Max load capacity: {box.max_load_capacity}\n- Estimated load: {box.estiomated_load}"
                         font.pixelSize: 16
@@ -206,6 +218,9 @@ Window {
                                 icon.source: "qrc:/FullScreen3DView/assets/info-24.png"
                                 icon.color: "#006dd9"
                                 display: AbstractButton.IconOnly
+                                ToolTip.visible: hovered
+                                ToolTip.delay: 0
+                                ToolTip.text: "Expected format:\n{\n  \"boxes\": [\n    { \"w\": int, \"l\": int, \"h\": int,\n      \"weight\": float, \"max_load\": int }\n  ]\n}"
                             }
                         }
 
@@ -216,6 +231,45 @@ Window {
                             text: qsTr("Browse")
                             font.pixelSize: 16
                             icon.source: "qrc:/FullScreen3DView/assets/folder-24.png"
+                            onClicked: {
+                                fileDialog.open();
+                            }
+                        }
+
+                        FileDialog {
+                            id: fileDialog
+                            title: "Select a JSON file"
+                            nameFilters: ["JSON files (*.json)"]
+                            fileMode: FileDialog.OpenFile
+                            onAccepted: {
+                                console.log("Selected file:", fileDialog.selectedFile)
+                                mainWindow.processBoxesJsonFile(fileDialog.selectedFile)
+                            }
+                        }
+
+                        Text {
+                            id: jsonErrorText
+                            text: mainWindow.jsonErrorMessage
+                            color: "red"
+                            font.bold: true
+                            visible: text.length > 0
+                            wrapMode: Text.Wrap
+                        }
+
+                        Button {
+                            text: "Preview JSON"
+                            enabled: mainWindow.isJsonLoaded
+                            onClicked: {
+                                const component = Qt.createComponent("qrc:/FullScreen3DView/qml/PreviewWindow.qml");
+                                if (component.status === Component.Ready) {
+                                    const preview = component.createObject(null);
+                                    if (!preview) {
+                                        console.log("Failed to create PreviewWindow");
+                                    }
+                                } else {
+                                    console.log("Failed to load PreviewWindow.qml:", component.errorString());
+                                }
+                            }
                         }
                     }
 
@@ -228,7 +282,6 @@ Window {
                         Layout.fillWidth: true
                         Layout.preferredHeight: btStartSimulation.height
                         spacing: 0
-                        visible: false
 
                         Item {
                             Layout.fillWidth: true
@@ -236,10 +289,14 @@ Window {
 
                         Button {
                             id: btStartSimulation
+                            enabled: mainWindow.isJsonLoaded
                             Layout.preferredWidth: 200
                             Layout.preferredHeight: 40
                             text: qsTr("Start simulation")
                             font.pixelSize: 16
+                            onClicked: {
+                                mainWindow.startSimulation();
+                            }
                         }
                     }
                 }
