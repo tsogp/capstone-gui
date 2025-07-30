@@ -17,7 +17,7 @@ class BoxData {
 
 public:
     BoxData() = default;
-    BoxData(int id, double weight, int maxLoad, QVector3D position, QVector3D rotation, QVector3D scaleFactor);
+    BoxData(int id, double weight, int maxLoad, QVector3D position, QVector3D rotation, QVector3D scaleFactor, QVector3D dimensions);
 
     int m_id;
     double m_weight;

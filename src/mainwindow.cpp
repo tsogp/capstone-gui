@@ -110,7 +110,7 @@ QString MainWindow::getRawJson() const {
 
 QString MainWindow::getValidBoxesSummary() const {
     QString summary;
-    for (const auto &box : m_boxes) {
+    for (const auto &box : m_inputBoxes) {
         summary += QString("Box %1: %2x%3x%4, weight %5, maxLoad %6\n")
                        .arg(box.m_id)
                        .arg(box.m_dimensions.y())
@@ -191,25 +191,24 @@ void MainWindow::processBoxesJsonFile(const QUrl &fileUrl) {
             continue;
         }
 
-        BoxData b;
-        b.m_id = obj["id"].toInt();
-        b.m_dimensions.setY(obj["w"].toDouble());
-        b.m_dimensions.setX(obj["l"].toDouble());
-        b.m_dimensions.setZ(obj["h"].toDouble());
-        b.m_weight = obj["weight"].toDouble();
-        b.m_maxLoad = obj["max_load"].toInt();
+        BoxData b = BoxData(obj["id"].toInt(),
+                            obj["weight"].toDouble(),
+                            obj["max_load"].toInt(),
+                            QVector3D(0, 0, 0),
+                            QVector3D(0, 0, 0),
+                            QVector3D(0, 0, 0),
+                            QVector3D(obj["l"].toDouble(), obj["w"].toDouble(), obj["h"].toDouble()));
         parsedBoxes.append(b);
     }
 
-    m_boxes = parsedBoxes;
-    m_3dView->setBoxes(parsedBoxes);
+    m_inputBoxes = parsedBoxes;
     m_invalidBoxes = invalidBoxes;
     m_rawJson = QString::fromUtf8(data);
     m_jsonErrorMessage.clear();
     m_isJsonLoaded = true;
     emit jsonErrorMessageChanged();
     emit isJsonLoadedChanged();
-    qDebug() << "Loaded" << m_boxes.size() << "valid boxes,"
+    qDebug() << "Loaded" << m_inputBoxes.size() << "valid boxes,"
              << m_invalidBoxes.size() << "invalid entries.";
 }
 
@@ -218,7 +217,7 @@ bool MainWindow::isJsonLoaded() const {
 }
 
 void MainWindow::startSimulation() {
-    m_3dView->setBoxes(m_boxes);
+    // Assuming the simulation starts, and algorithm begins
     m_hasSimulationStarted = true;
     emit simulationStarted();
 }
@@ -227,18 +226,10 @@ bool MainWindow::hasSimulationStarted() const {
     return m_hasSimulationStarted;
 }
 
-void MainWindow::updateBoxInfo(const int &boxId) {
+void MainWindow::updateBoxInfo(const QString &boxInfo) {
     // TODO: Finishing touches to display more detailed box info in the UI
-    qDebug() << DEBUG_PREFIX << "Box info updated for ID:" << boxId;
-    BoxData box = m_boxes.at(boxId);
-    QString info = QString("Box %1: %2x%3x%4, weight %5, maxLoad %6")
-                       .arg(box.m_id)
-                       .arg(box.m_dimensions.y())
-                       .arg(box.m_dimensions.x())
-                       .arg(box.m_dimensions.z())
-                       .arg(box.m_weight)
-                       .arg(box.m_maxLoad);
-    emit boxInfoUpdated(info);
+    qDebug() << DEBUG_PREFIX << "Box info updated";
+    emit boxInfoUpdated(boxInfo);
 }
 
 void MainWindow::onFullScreen3DWindowClosed() {

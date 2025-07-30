@@ -9,6 +9,7 @@
 #include <QStack>
 #include <QString>
 #include <QVector3D>
+#include <qcontainerfwd.h>
 #include <qqmlcontext.h>
 #include <qtmetamacros.h>
 #include <qvectornd.h>
@@ -33,20 +34,23 @@ public slots:
 
 public:
     explicit ThreeDSpaceView(QQmlContext *contextPtr, QObject *parent = nullptr);
-    void setBoxes(const QVector<BoxData> &boxes);
+    void setOutputBoxes(const QVector<BoxData> &outputBoxes);
     ~ThreeDSpaceView();
 
 public slots:
     BoxData getNewBox();
     QVariantList getSpawnedBoxes();
+    void processOutputBoxesJsonFile(const QUrl &fileUrl);
+    void select3DBox(const int &boxId);
 signals:
     void currentModelSourceChanged(const QString &src);
     void rotationDeltaChanged();
     void zoomLevelChanged();
     void palletDataChanged();
+    void updateBoxInfo(const QString &boxInfo);
 
 private:
-    QVector<BoxData> m_boxes;
+    QVector<BoxData> m_outputBoxes;
     QStack<BoxData> m_spawnedBoxes;
     QVector3D m_palletData;
     QString m_currentModelSource;

@@ -52,6 +52,14 @@ Item {
         }
     }
 
+    Connections {
+        target: threeDSpaceView
+
+        function onUpdateBoxInfo(boxInfo) {
+            mainWindow.updateBoxInfo(boxInfo);
+        }
+    }
+
     Component.onCompleted: {
         rotationDelta = threeDSpaceView.rotationDelta;
         zoomLevel = threeDSpaceView.zoomLevel;
@@ -62,7 +70,7 @@ Item {
 
         let boxes = threeDSpaceView.getSpawnedBoxes();
         for (let i = 0; i < boxes.length; ++i) {
-            spawnBoxInQML(boxes[i].position, palletRotation, boxes[i].scaleFactor, boxes[i].id);
+            spawnBoxInQML(boxes[i].position, boxes[i].scaleFactor, boxes[i].dimensions, boxes[i].id);
         }
     }
 
@@ -93,6 +101,30 @@ Item {
         }
 
         onWheel: wheel => modifyZoomLevel(wheel.angleDelta.y / (Math.abs(wheel.angleDelta.y) * 10), wheel.inverted)
+
+        onClicked: function (mouse) {
+            var result = view3D.pick(mouse.x, mouse.y);
+
+            if (result.objectHit && result.objectHit.objectName === "cartonBoxModel") {
+                var pickedModel = result.objectHit;
+                var boxNode = pickedModel.parent;
+
+                // Deselect previously selected box
+                if (view3D.selectedBox && view3D.selectedBox !== boxNode) {
+                    view3D.selectedBox.model.isPicked = false;
+                }
+
+                // Mark the new box as selected
+                if (pickedModel.isPicked) {
+                    pickedModel.isPicked = false;
+                    view3D.selectedBox = null;
+                } else {
+                    pickedModel.isPicked = true;
+                    view3D.selectedBox = boxNode;
+                    threeDSpaceView.select3DBox(boxNode.boxId);
+                }
+            }
+        }
     }
 
     View3D {
@@ -107,33 +139,6 @@ Item {
             backgroundMode: SceneEnvironment.Color
             antialiasingMode: SceneEnvironment.MSAA
             antialiasingQuality: SceneEnvironment.High
-        }
-
-        MouseArea {
-            anchors.fill: parent
-            onClicked: function (mouse) {
-                var result = view3D.pick(mouse.x, mouse.y);
-
-                if (result.objectHit) {
-                    var pickedModel = result.objectHit;
-                    var boxNode = pickedModel.parent;
-
-                    // Deselect previously selected box
-                    if (view3D.selectedBox && view3D.selectedBox !== boxNode) {
-                        view3D.selectedBox.model.isPicked = false;
-                    }
-
-                    // Mark the new box as selected
-                    if (pickedModel.isPicked) {
-                        pickedModel.isPicked = false;
-                        view3D.selectedBox = null;
-                    } else {
-                        pickedModel.isPicked = true;
-                        view3D.selectedBox = boxNode;
-                        mainWindow.updateBoxInfo(boxNode.boxId);
-                    }
-                }
-            }
         }
 
         PerspectiveCamera {
@@ -223,6 +228,7 @@ Item {
             bottom: parent.bottom
             margins: 16
         }
+        enabled: mainWindow.hasSimulationStarted
 
         onClicked: {
             let box = threeDSpaceView.getNewBox();

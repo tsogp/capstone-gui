@@ -232,18 +232,18 @@ Window {
                             font.pixelSize: 16
                             icon.source: "qrc:/FullScreen3DView/assets/folder-24.png"
                             onClicked: {
-                                fileDialog.open();
+                                inputBoxFileDialog.open();
                             }
                         }
 
                         FileDialog {
-                            id: fileDialog
+                            id: inputBoxFileDialog
                             title: "Select a JSON file"
                             nameFilters: ["JSON files (*.json)"]
                             fileMode: FileDialog.OpenFile
                             onAccepted: {
-                                console.log("Selected file:", fileDialog.selectedFile)
-                                mainWindow.processBoxesJsonFile(fileDialog.selectedFile)
+                                console.log("Selected file:", inputBoxFileDialog.selectedFile)
+                                mainWindow.processBoxesJsonFile(inputBoxFileDialog.selectedFile)
                             }
                         }
 
@@ -294,8 +294,22 @@ Window {
                             Layout.preferredHeight: 40
                             text: qsTr("Start simulation")
                             font.pixelSize: 16
+                            // TODO: Start the simulation ONLY AFTER algo is finished
                             onClicked: {
                                 mainWindow.startSimulation();
+                                outputBoxFileDialog.open();
+                            }
+                        }
+
+                        // TODO: Remove after algo integration is done
+                        FileDialog {
+                            id: outputBoxFileDialog
+                            title: "Select an OUTPUT JSON file"
+                            nameFilters: ["JSON files (*.json)"]
+                            fileMode: FileDialog.OpenFile
+                            onAccepted: {
+                                console.log("Selected file:", outputBoxFileDialog.selectedFile)
+                                threeDSpaceView.processOutputBoxesJsonFile(outputBoxFileDialog.selectedFile)
                             }
                         }
                     }

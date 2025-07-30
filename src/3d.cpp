@@ -11,6 +11,9 @@
 #include <qsettings.h>
 #include <qvariant.h>
 #include <qvectornd.h>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QFile>
 
 #define WINDOW_NAME "3DWindow"
 #define DEBUG_PREFIX "[" WINDOW_NAME "]:"
@@ -40,8 +43,73 @@ QVariantList ThreeDSpaceView::getSpawnedBoxes() {
     return list;
 }
 
-void ThreeDSpaceView::setBoxes(const QVector<BoxData> &boxes) {
-    m_boxes = boxes;
+// TODO: Revise after integration with the algorithm
+void ThreeDSpaceView::processOutputBoxesJsonFile(const QUrl &fileUrl) {
+    // Assumes the returned file is a valid JSON file containing 
+    // an array of BoxData objects, thus no error handling for file existence
+    QFile file(fileUrl.toLocalFile());
+    if (!file.open(QIODevice::ReadOnly)) {
+        qWarning("Could not open JSON file.");
+        return;
+    }
+
+    QByteArray data = file.readAll();
+    file.close();
+
+    QJsonParseError parseError;
+    QJsonDocument doc = QJsonDocument::fromJson(data, &parseError);
+    if (parseError.error != QJsonParseError::NoError) {
+        qWarning() << "JSON Parse Error:" << parseError.errorString();
+        return;
+    }
+
+    QVector<BoxData> parsedOutputBoxes;
+
+    for (const QJsonValue &val : doc.array()) {
+        QJsonObject obj = val.toObject();
+        
+        BoxData box =
+            BoxData(obj["id"].toInt(),
+                    obj["weight"].toDouble(),
+                    obj["max_load"].toInt(),
+                    QVector3D(obj["x"].toInt(), obj["y"].toInt(), obj["z"].toInt()), // Placeholder for position
+                    QVector3D(0, 0, 0),                                              // Placeholder for rotation
+                    QVector3D(1, 1, 1),                                              // Placeholder for scale factor
+                    QVector3D(obj["l"].toInt(), obj["w"].toInt(), obj["h"].toInt()));
+
+        parsedOutputBoxes.append(box);
+    }
+
+    setOutputBoxes(parsedOutputBoxes);
+}
+
+void ThreeDSpaceView::setOutputBoxes(const QVector<BoxData> &boxes) {
+    m_outputBoxes = boxes;
+}
+
+void ThreeDSpaceView::select3DBox(const int &boxId) {
+    for (const BoxData &box : m_outputBoxes) {
+        if (box.m_id == boxId) {
+            QString info = QString("Box ID: %1\n"
+                                   "Weight: %2\n"
+                                   "Max Load: %3\n"
+                                   "Position: (%4, %5, %6)\n"
+                                   "Dimensions: (%7, %8, %9)")
+                               .arg(box.m_id)
+                               .arg(box.m_weight)
+                               .arg(box.m_maxLoad)
+                               .arg(box.m_position.x())
+                               .arg(box.m_position.y())
+                               .arg(box.m_position.z())
+                               .arg(box.m_dimensions.x())
+                               .arg(box.m_dimensions.y())
+                               .arg(box.m_dimensions.z());
+            emit updateBoxInfo(info);
+            qDebug() << DEBUG_PREFIX << "Send info from 3D view for box ID:" << boxId;
+            return;  // Exit after finding the box
+        }
+    }
+    qDebug() << DEBUG_PREFIX << "No box found with ID:" << boxId;
 }
 
 BoxData ThreeDSpaceView::getNewBox() {
@@ -60,8 +128,8 @@ BoxData ThreeDSpaceView::getNewBox() {
     QVector3D scaleFactor(scale, scale, scale);
     
     // TODO: after algo integration, these variables should not need to be assigned
-    BoxData newBox = BoxData(m_spawnedBoxes.size(), 12, 12, position, rotation, scaleFactor);
-    m_spawnedBoxes.push(newBox);
+    BoxData jsonBox = m_outputBoxes.at(m_spawnedBoxes.size());
+    BoxData newBox = BoxData(jsonBox.m_id, jsonBox.m_weight, jsonBox.m_maxLoad, jsonBox.m_position, rotation, scaleFactor, jsonBox.dimensions());  m_spawnedBoxes.push(newBox);
 
     return newBox;
 }

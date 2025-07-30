@@ -27,14 +27,14 @@ public slots:
     bool isJsonLoaded() const;
     void startSimulation();
     bool hasSimulationStarted() const;
-    void updateBoxInfo(const int &boxId);
+    void updateBoxInfo(const QString &boxInfo);
 
 public:
     MainWindow();
 
     void loadMainQml();
     bool isFullScreenViewOpen() const { return m_isFullScreenViewOpen; }
-    const QVector<BoxData> &boxes() const { return m_boxes;}
+    const QVector<BoxData> &inputBoxes() const { return m_inputBoxes; }
     QString jsonErrorMessage() const { return m_jsonErrorMessage;}
 
 signals:
@@ -54,7 +54,7 @@ private:
     QPointer<FullScreen3DWindow> m_secondWindow;
     QJsonArray palletArray;
     bool m_isFullScreenViewOpen = false;
-    QVector<BoxData> m_boxes;
+    QVector<BoxData> m_inputBoxes;
     QList<QString> m_invalidBoxes;
     QString m_rawJson;
     QString m_jsonErrorMessage;
