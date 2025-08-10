@@ -173,6 +173,14 @@ Item {
                 }
             }
 
+            // TEMPORARY CIRCLE TO IDENTIFY (0,0,0)
+            Model {
+                source: "#Sphere" // built-in primitive
+                scale: Qt.vector3d(0.1, 0.1, 0.1)
+                materials: DefaultMaterial { diffuseColor: "red" }
+                position: Qt.vector3d(0, -10, 0)
+            }
+
             Node {
                 id: shapeSpawner
                 position: Qt.vector3d(0, 30, 0)
