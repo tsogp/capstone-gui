@@ -68,6 +68,11 @@ Item {
         applyRotationToAll();
         applyZoomToAll();
 
+        if (fromFullScreen && viewSlicingEnabled) {
+            moveSlicePlane(true);
+            moveSlicePlane(false);
+        }
+
         let boxes = threeDSpaceView.getSpawnedBoxes();
         for (let i = 0; i < boxes.length; ++i) {
             spawnBoxInQML(boxes[i].position, boxes[i].scaleFactor, boxes[i].dimensions, boxes[i].id);
