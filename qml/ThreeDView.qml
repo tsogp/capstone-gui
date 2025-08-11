@@ -118,6 +118,7 @@ Item {
                 if (pickedModel.isPicked) {
                     pickedModel.isPicked = false;
                     view3D.selectedBox = null;
+                    mainWindow.clearBoxInfo();
                 } else {
                     pickedModel.isPicked = true;
                     view3D.selectedBox = boxNode;

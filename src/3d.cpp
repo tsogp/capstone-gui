@@ -87,7 +87,11 @@ void ThreeDSpaceView::setOutputBoxes(const QVector<BoxData> &boxes) {
     m_outputBoxes = boxes;
 }
 
-void ThreeDSpaceView::select3DBox(const int &boxId) {
+void ThreeDSpaceView::select3DBox(int boxId) {
+    if (boxId == -1) {
+
+    }
+
     for (const BoxData &box : m_outputBoxes) {
         if (box.m_id == boxId) {
             QString info = QString("Box ID: %1\n"

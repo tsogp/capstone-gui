@@ -41,13 +41,14 @@ public slots:
     BoxData getNewBox();
     QVariantList getSpawnedBoxes();
     void processOutputBoxesJsonFile(const QUrl &fileUrl);
-    void select3DBox(const int &boxId);
+    void select3DBox(int boxId);
 signals:
     void currentModelSourceChanged(const QString &src);
     void rotationDeltaChanged();
     void zoomLevelChanged();
     void palletDataChanged();
     void updateBoxInfo(const QString &boxInfo);
+    void clearBoxInfo();
 
 private:
     QVector<BoxData> m_outputBoxes;

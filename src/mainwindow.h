@@ -28,6 +28,7 @@ public slots:
     void startSimulation();
     bool hasSimulationStarted() const;
     void updateBoxInfo(const QString &boxInfo);
+    void clearBoxInfo();
 
 public:
     MainWindow();
@@ -44,6 +45,7 @@ signals:
     void isJsonLoadedChanged();
     void simulationStarted();
     void boxInfoUpdated(const QString &boxInfo);
+    void boxInfoCleared();
 
 private slots:
     void onFullScreen3DWindowClosed();
