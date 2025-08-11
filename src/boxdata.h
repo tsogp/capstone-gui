@@ -29,6 +29,7 @@ public:
     QVector3D m_dimensions;
 
     QVector3D dimensions() const;
+    QVector3D boxSize() const;
 };
 
 Q_DECLARE_METATYPE(BoxData)

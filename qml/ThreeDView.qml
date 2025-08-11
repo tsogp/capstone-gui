@@ -168,22 +168,21 @@ Item {
                 asynchronous: true
 
                 onLoaded: {
-                    item.position = Qt.vector3d(0, 5, 0);
+                    item.position = Qt.vector3d(0, 0, 0);
                     item.scale = Qt.vector3d(1.5, 1.5, 1.5);
                 }
             }
 
-            // TEMPORARY CIRCLE TO IDENTIFY (0,0,0)
             Model {
-                source: "#Sphere" // built-in primitive
-                scale: Qt.vector3d(0.1, 0.1, 0.1)
-                materials: DefaultMaterial { diffuseColor: "red" }
-                position: Qt.vector3d(0, -10, 0)
+                source: "#Cube"
+                scale: Qt.vector3d(0.3, 0.1, 0.3)
+                materials: DefaultMaterial { diffuseColor: "blue" }
+                position: Qt.vector3d(-35, 50.67, -19)
             }
 
             Node {
                 id: shapeSpawner
-                position: Qt.vector3d(0, 30, 0)
+                position: Qt.vector3d(0, 0, 0)
                 objectName: "shapeSpawner"
             }
 
@@ -270,8 +269,6 @@ Item {
                 "position": position,
                 "scale": scale,
                 "dimensions": dimensions,
-                "animStartY": 150,
-                "animEndY": position.y,
                 "boxId": id
             });
 

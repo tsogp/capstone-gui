@@ -7,6 +7,7 @@
 #include <QRandomGenerator>
 #include <algorithm>
 #include <qcontainerfwd.h>
+#include <qdebug.h>
 #include <qrandom.h>
 #include <qsettings.h>
 #include <qvariant.h>
@@ -32,7 +33,7 @@ QVector2D ThreeDSpaceView::rotationDelta() const {
 }
 
 QVector3D ThreeDSpaceView::palletData() const {
-    return m_palletData;
+    return m_palletData; // 120, 9.8, 80
 }
 
 QVariantList ThreeDSpaceView::getSpawnedBoxes() {
@@ -62,7 +63,15 @@ void ThreeDSpaceView::processOutputBoxesJsonFile(const QUrl &fileUrl) {
         qWarning() << "JSON Parse Error:" << parseError.errorString();
         return;
     }
-
+    // Parse the JSON array into BoxData objects
+    /* NOTE:
+    The JSON output file has the x as width, y as length, z as height.
+    In current 3D space (as of 8/11/2025), x is up-down, y is in-out, z is left-right.
+    "Length is the longer side", hence 
+        outputY = palletX = length, 
+        outputZ = palletY = height, 
+        outputX = palletZ = width.
+    */
     QVector<BoxData> parsedOutputBoxes;
 
     for (const QJsonValue &val : doc.array()) {
@@ -72,10 +81,10 @@ void ThreeDSpaceView::processOutputBoxesJsonFile(const QUrl &fileUrl) {
             BoxData(obj["id"].toInt(),
                     obj["weight"].toDouble(),
                     obj["max_load"].toInt(),
-                    QVector3D(obj["x"].toInt(), obj["y"].toInt(), obj["z"].toInt()), // Placeholder for position
+                    QVector3D(obj["y"].toInt(), obj["z"].toInt(), obj["x"].toInt()), 
                     QVector3D(0, 0, 0),                                              // Placeholder for rotation
-                    QVector3D(1, 1, 1),                                              // Placeholder for scale factor
-                    QVector3D(obj["l"].toInt(), obj["w"].toInt(), obj["h"].toInt()));
+                    QVector3D(1, 1, 1),                                           // Placeholder for scale factor
+                    QVector3D(obj["l"].toInt(), obj["h"].toInt(), obj["w"].toInt()));
 
         parsedOutputBoxes.append(box);
     }
@@ -113,24 +122,36 @@ void ThreeDSpaceView::select3DBox(const int &boxId) {
 }
 
 BoxData ThreeDSpaceView::getNewBox() {
-    // TODO: create actual spwaning logic with collision detection
-    double xHalf = static_cast<double>(m_palletData.x() / 2);
-    double zHalf = static_cast<double>(m_palletData.z() / 2);
-    
-    // Random value in range [-xHalf, +xHalf]
-    double xVal = (QRandomGenerator::global()->generateDouble() * 2.0 - 1.0) * xHalf;
-    double zVal = (QRandomGenerator::global()->generateDouble() * 2.0 - 1.0) * zHalf;
-    // double scale = std::max(1.0, QRandomGenerator::global()->generateDouble() * 3.0);
-    double scale = 1.0f;
-
-    QVector3D position(xVal, -m_palletData.y(), zVal);
-    QVector3D rotation(0, 0, 0);
-    QVector3D scaleFactor(scale, scale, scale);
-    
-    // TODO: after algo integration, these variables should not need to be assigned
     BoxData jsonBox = m_outputBoxes.at(m_spawnedBoxes.size());
-    BoxData newBox = BoxData(jsonBox.m_id, jsonBox.m_weight, jsonBox.m_maxLoad, jsonBox.m_position, rotation, scaleFactor, jsonBox.dimensions());  m_spawnedBoxes.push(newBox);
 
+    // Convert box dimensions to standard 3D space units
+    /* NOTE:
+        There is an issue with the scale factors + 3D model that results in gaps during rendering.
+        - The QVector3D does not store enough decimal places to make the final result closer to the expected dimensions.
+        - There is a gap between the rendered boxes regardless of the scale factor (check spawn coordinates).
+    */
+    QVector3D boxSize = QVector3D((jsonBox.m_dimensions.x() / jsonBox.boxSize().x()) + 0.05, // Tuning the scale factor
+                                  (jsonBox.m_dimensions.y() / jsonBox.boxSize().y()) + 0.06,
+                                  (jsonBox.m_dimensions.z() / jsonBox.boxSize().z()) + 0.05);
+    QVector3D position = jsonBox.m_position;
+
+    // Calculate the displacement relative to the pallet
+    double xVal = position.x() - (m_palletData.x() / 2) + (jsonBox.m_dimensions.x() / 2); // Up and down
+    double yVal = position.y() + (m_palletData.y() / 2); // In and out
+    double zVal = position.z() - (m_palletData.z() / 2) + (jsonBox.m_dimensions.z() / 2); // Left and right
+    QVector3D rotation(0, 0, 0);
+    QVector3D boxDisplace(xVal, yVal, zVal);
+
+    // TODO: after algo integration, these variables should not need to be assigned
+    BoxData newBox = BoxData(jsonBox.m_id,
+                                jsonBox.m_weight,
+                                jsonBox.m_maxLoad,
+                                boxDisplace,
+                                rotation,
+                                boxSize,
+                                jsonBox.dimensions()
+                            );
+    m_spawnedBoxes.push(newBox);
     return newBox;
 }
 

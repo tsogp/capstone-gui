@@ -1,7 +1,7 @@
 #include "boxdata.h"
 #include <qvectornd.h>
 
-static constexpr QVector3D boxSize = QVector3D(38.11, 38.11, 38.11);
+static constexpr QVector3D boxUnitSize = QVector3D(38.11, 38.11, 38.11);
 
 BoxData::BoxData(int id,
                  double weight,
@@ -16,4 +16,8 @@ BoxData::BoxData(int id,
 
 QVector3D BoxData::dimensions() const {
     return m_dimensions;
+}
+
+QVector3D BoxData::boxSize() const {
+    return boxUnitSize;
 }

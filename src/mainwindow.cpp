@@ -197,7 +197,7 @@ void MainWindow::processBoxesJsonFile(const QUrl &fileUrl) {
                             QVector3D(0, 0, 0),
                             QVector3D(0, 0, 0),
                             QVector3D(0, 0, 0),
-                            QVector3D(obj["l"].toDouble(), obj["w"].toDouble(), obj["h"].toDouble()));
+                            QVector3D(obj["l"].toDouble(), obj["h"].toDouble(), obj["w"].toDouble()));
         parsedBoxes.append(b);
     }
 
