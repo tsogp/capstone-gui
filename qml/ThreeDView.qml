@@ -68,6 +68,11 @@ Item {
         applyRotationToAll();
         applyZoomToAll();
 
+        if (fromFullScreen && viewSlicingEnabled) {
+            moveSlicePlane(true);
+            moveSlicePlane(false);
+        }
+
         let boxes = threeDSpaceView.getSpawnedBoxes();
         for (let i = 0; i < boxes.length; ++i) {
             spawnBoxInQML(boxes[i].position, boxes[i].scaleFactor, boxes[i].dimensions, boxes[i].id);
@@ -118,6 +123,7 @@ Item {
                 if (pickedModel.isPicked) {
                     pickedModel.isPicked = false;
                     view3D.selectedBox = null;
+                    mainWindow.clearBoxInfo();
                 } else {
                     pickedModel.isPicked = true;
                     view3D.selectedBox = boxNode;
@@ -239,7 +245,9 @@ Item {
 
         onClicked: {
             let box = threeDSpaceView.getNewBox();
-            spawnBoxInQML(box.position, box.scaleFactor, box.dimensions, box.id);
+            if (box !== null && box !== undefined) {
+                spawnBoxInQML(box.position, box.scaleFactor, box.dimensions, box.id);
+            }
         }
     }
 

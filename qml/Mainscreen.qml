@@ -32,6 +32,10 @@ Window {
         function onBoxInfoUpdated(info) {
             txtBoxInfo.text = info;
         }
+
+        function onBoxInfoCleared() {
+            txtBoxInfo.text = qsTr("Simulation started. Click on boxes to interact with them.");
+        }
     }
 
     Rectangle {

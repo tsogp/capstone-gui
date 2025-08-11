@@ -11,6 +11,7 @@
 #include <memory>
 #include <qdebug.h>
 #include <qobject.h>
+#include <qtmetamacros.h>
 
 #define MAINWINDOW_URL "qrc:/FullScreen3DView/qml/Mainscreen.qml"
 #define WINDOW_NAME "MainWindow"
@@ -230,6 +231,10 @@ void MainWindow::updateBoxInfo(const QString &boxInfo) {
     // TODO: Finishing touches to display more detailed box info in the UI
     qDebug() << DEBUG_PREFIX << "Box info updated";
     emit boxInfoUpdated(boxInfo);
+}
+
+void MainWindow::clearBoxInfo() {
+    emit boxInfoCleared();
 }
 
 void MainWindow::onFullScreen3DWindowClosed() {

@@ -6,6 +6,7 @@
 #include <QQmlContext>
 #include <QRandomGenerator>
 #include <algorithm>
+#include <optional>
 #include <qcontainerfwd.h>
 #include <qdebug.h>
 #include <qrandom.h>
@@ -96,7 +97,11 @@ void ThreeDSpaceView::setOutputBoxes(const QVector<BoxData> &boxes) {
     m_outputBoxes = boxes;
 }
 
-void ThreeDSpaceView::select3DBox(const int &boxId) {
+void ThreeDSpaceView::select3DBox(int boxId) {
+    if (boxId == -1) {
+
+    }
+
     for (const BoxData &box : m_outputBoxes) {
         if (box.m_id == boxId) {
             QString info = QString("Box ID: %1\n"
@@ -121,9 +126,13 @@ void ThreeDSpaceView::select3DBox(const int &boxId) {
     qDebug() << DEBUG_PREFIX << "No box found with ID:" << boxId;
 }
 
-BoxData ThreeDSpaceView::getNewBox() {
-    BoxData jsonBox = m_outputBoxes.at(m_spawnedBoxes.size());
+QVariant ThreeDSpaceView::getNewBox() {
+    if (m_outputBoxes.size() == m_spawnedBoxes.size()) {
+        return QVariant();
+    }
+    qDebug() << m_outputBoxes.size() << ' ' << m_spawnedBoxes.size() << '\n';
 
+    BoxData jsonBox = m_outputBoxes.at(m_spawnedBoxes.size());
     // Convert box dimensions to standard 3D space units
     /* NOTE:
         There is an issue with the scale factors + 3D model that results in gaps during rendering.
@@ -143,7 +152,7 @@ BoxData ThreeDSpaceView::getNewBox() {
     QVector3D boxDisplace(xVal, yVal, zVal);
 
     // TODO: after algo integration, these variables should not need to be assigned
-    BoxData newBox = BoxData(jsonBox.m_id,
+        BoxData newBox = BoxData(jsonBox.m_id,
                                 jsonBox.m_weight,
                                 jsonBox.m_maxLoad,
                                 boxDisplace,
@@ -152,7 +161,8 @@ BoxData ThreeDSpaceView::getNewBox() {
                                 jsonBox.dimensions()
                             );
     m_spawnedBoxes.push(newBox);
-    return newBox;
+    
+    return QVariant::fromValue(newBox);;
 }
 
 void ThreeDSpaceView::setCurrentModelSource(const QString &src) {
