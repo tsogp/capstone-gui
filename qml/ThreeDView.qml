@@ -233,7 +233,9 @@ Item {
 
         onClicked: {
             let box = threeDSpaceView.getNewBox();
-            spawnBoxInQML(box.position, box.scaleFactor, box.dimensions, box.id);
+            if (box !== null && box !== undefined) {
+                spawnBoxInQML(box.position, box.scaleFactor, box.dimensions, box.id);
+            }
         }
     }
 

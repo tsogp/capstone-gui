@@ -38,7 +38,7 @@ public:
     ~ThreeDSpaceView();
 
 public slots:
-    BoxData getNewBox();
+    QVariant getNewBox();
     QVariantList getSpawnedBoxes();
     void processOutputBoxesJsonFile(const QUrl &fileUrl);
     void select3DBox(int boxId);

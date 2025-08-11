@@ -6,6 +6,7 @@
 #include <QQmlContext>
 #include <QRandomGenerator>
 #include <algorithm>
+#include <optional>
 #include <qcontainerfwd.h>
 #include <qrandom.h>
 #include <qsettings.h>
@@ -116,7 +117,10 @@ void ThreeDSpaceView::select3DBox(int boxId) {
     qDebug() << DEBUG_PREFIX << "No box found with ID:" << boxId;
 }
 
-BoxData ThreeDSpaceView::getNewBox() {
+QVariant ThreeDSpaceView::getNewBox() {
+    if (m_outputBoxes.size() == m_spawnedBoxes.size()) {
+        return QVariant();
+    }
     // TODO: create actual spwaning logic with collision detection
     double xHalf = static_cast<double>(m_palletData.x() / 2);
     double zHalf = static_cast<double>(m_palletData.z() / 2);
@@ -132,10 +136,11 @@ BoxData ThreeDSpaceView::getNewBox() {
     QVector3D scaleFactor(scale, scale, scale);
     
     // TODO: after algo integration, these variables should not need to be assigned
+    qDebug() << m_outputBoxes.size() << ' ' << m_spawnedBoxes.size() << '\n';
     BoxData jsonBox = m_outputBoxes.at(m_spawnedBoxes.size());
     BoxData newBox = BoxData(jsonBox.m_id, jsonBox.m_weight, jsonBox.m_maxLoad, jsonBox.m_position, rotation, scaleFactor, jsonBox.dimensions());  m_spawnedBoxes.push(newBox);
 
-    return newBox;
+    return QVariant::fromValue(newBox);;
 }
 
 void ThreeDSpaceView::setCurrentModelSource(const QString &src) {
