@@ -139,9 +139,9 @@ QVariant ThreeDSpaceView::getNewBox() {
         - The QVector3D does not store enough decimal places to make the final result closer to the expected dimensions.
         - There is a gap between the rendered boxes regardless of the scale factor (check spawn coordinates).
     */
-    QVector3D boxSize = QVector3D((jsonBox.m_dimensions.x() / jsonBox.boxSize().x()) + 0.05, // Tuning the scale factor
-                                  (jsonBox.m_dimensions.y() / jsonBox.boxSize().y()) + 0.06,
-                                  (jsonBox.m_dimensions.z() / jsonBox.boxSize().z()) + 0.05);
+    QVector3D boxSize = QVector3D((jsonBox.m_dimensions.x() / jsonBox.boxSize().x()), // Tuning the scale factor
+                                  (jsonBox.m_dimensions.y() / jsonBox.boxSize().y()),
+                                  (jsonBox.m_dimensions.z() / jsonBox.boxSize().z()));
     QVector3D position = jsonBox.m_position;
 
     // Calculate the displacement relative to the pallet
