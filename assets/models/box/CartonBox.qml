@@ -14,25 +14,15 @@ Node {
     Model {
         id: cartonBoxModel
         objectName: "cartonBoxModel"
-        source: "meshes/carton_box.mesh"
+        source: "#Cube"
         pickable: true
         property bool isPicked: false
 
-        materials: [
-            PrincipledMaterial {
-                id: cartonBoxDefaultMaterial
-                baseColorMap: Texture {
-                    source: cartonBoxModel.isPicked ?
-                                "" : "qrc:/FullScreen3DView/assets/models/box/textures/carton_box.jpg"
-                }
-                roughness: 1
-                indexOfRefraction: 1
-
-                // Fade-in transparency
-                opacity: cartonBox.opacityValue
-                baseColor: Qt.rgba(1, 1, 1, cartonBox.opacityValue)
-            }
-        ]
+        materials: DefaultMaterial {
+            id: mat
+            diffuseColor: Qt.rgba(0.2, 0.6, 1.0, cartonBox.opacityValue) // blue with fade
+            opacity: cartonBox.opacityValue
+        }
     }
 
     // Fade-in animation (runs on cartonBox.opacityValue)

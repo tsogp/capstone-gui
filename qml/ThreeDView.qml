@@ -179,13 +179,6 @@ Item {
                 }
             }
 
-            Model {
-                source: "#Cube"
-                scale: Qt.vector3d(0.3, 0.1, 0.3)
-                materials: DefaultMaterial { diffuseColor: "blue" }
-                position: Qt.vector3d(-35, 50.67, -19)
-            }
-
             Node {
                 id: shapeSpawner
                 position: Qt.vector3d(0, 0, 0)

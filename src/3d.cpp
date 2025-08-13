@@ -133,20 +133,21 @@ QVariant ThreeDSpaceView::getNewBox() {
     qDebug() << m_outputBoxes.size() << ' ' << m_spawnedBoxes.size() << '\n';
 
     BoxData jsonBox = m_outputBoxes.at(m_spawnedBoxes.size());
+    double scaleFactor = 0.01; // From IRL to 3D space, 100:1
     // Convert box dimensions to standard 3D space units
     /* NOTE:
         There is an issue with the scale factors + 3D model that results in gaps during rendering.
         - The QVector3D does not store enough decimal places to make the final result closer to the expected dimensions.
         - There is a gap between the rendered boxes regardless of the scale factor (check spawn coordinates).
     */
-    QVector3D boxSize = QVector3D((jsonBox.m_dimensions.x() / jsonBox.boxSize().x()), // Tuning the scale factor
-                                  (jsonBox.m_dimensions.y() / jsonBox.boxSize().y()),
-                                  (jsonBox.m_dimensions.z() / jsonBox.boxSize().z()));
+    QVector3D boxSize = QVector3D((jsonBox.m_dimensions.x() * scaleFactor),
+                                  (jsonBox.m_dimensions.y() * scaleFactor),
+                                  (jsonBox.m_dimensions.z() * scaleFactor));
     QVector3D position = jsonBox.m_position;
 
     // Calculate the displacement relative to the pallet
     double xVal = position.x() - (m_palletData.x() / 2) + (jsonBox.m_dimensions.x() / 2); // Up and down
-    double yVal = position.y() + (m_palletData.y() / 2); // In and out
+    double yVal = position.y() + (m_palletData.y() / 2) + (jsonBox.m_dimensions.y() / 2); // In and out
     double zVal = position.z() - (m_palletData.z() / 2) + (jsonBox.m_dimensions.z() / 2); // Left and right
     QVector3D rotation(0, 0, 0);
     QVector3D boxDisplace(xVal, yVal, zVal);
