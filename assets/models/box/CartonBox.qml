@@ -8,8 +8,16 @@ Node {
     property alias model: cartonBoxModel
     property int boxId: 0
 
+    // Random RGB once per box
+    property real randR: Math.random()
+    property real randG: Math.random()
+    property real randB: Math.random()
+
     // Fade-in opacity property
-    property real opacityValue
+    property real opacityValue: 0.0
+
+    // Current color state
+    property color currentColor: Qt.rgba(randR, randG, randB, opacityValue)
 
     Model {
         id: cartonBoxModel
@@ -20,16 +28,33 @@ Node {
 
         materials: DefaultMaterial {
             id: mat
-            diffuseColor: Qt.rgba(0.2, 0.6, 1.0, cartonBox.opacityValue) // blue with fade
-            opacity: cartonBox.opacityValue
+            diffuseColor: currentColor
+            opacity: opacityValue
+        }
+
+        // Animate color change when picked/unpicked
+        onIsPickedChanged: {
+            colorAnim.from = currentColor
+            colorAnim.to = isPicked
+                ? Qt.rgba(1, 1, 0, opacityValue) // highlight yellow
+                : Qt.rgba(randR, randG, randB, opacityValue) // original
+            colorAnim.start()
         }
     }
 
-    // Fade-in animation (runs on cartonBox.opacityValue)
+    // Fade-in animation
     NumberAnimation on opacityValue {
         from: 0.0
         to: 1.0
-        duration: cartonBox.animationDuration
+        duration: animationDuration
         running: true
+    }
+
+    // Color animation
+    ColorAnimation {
+        id: colorAnim
+        target: cartonBox
+        property: "currentColor"
+        duration: 50
     }
 }
