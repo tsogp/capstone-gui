@@ -3,6 +3,7 @@
 
 #include "3d.h"
 #include "fullscreen3dwindow.h"
+#include "networkhelper.h"
 #include <QJsonArray>
 #include <QObject>
 #include <QPointer>
@@ -16,6 +17,7 @@ class MainWindow : public QQmlApplicationEngine {
     Q_PROPERTY(QString jsonErrorMessage READ jsonErrorMessage NOTIFY jsonErrorMessageChanged)
     Q_PROPERTY(bool isJsonLoaded READ isJsonLoaded NOTIFY isJsonLoadedChanged)
     Q_PROPERTY(bool hasSimulationStarted READ hasSimulationStarted NOTIFY simulationStarted)
+    Q_PROPERTY(bool isRequestInProgress READ isRequestInProgress NOTIFY isRequestInProgressChanged)
 
 public slots:
     void openFullScreen3DWindow(const QString &message);
@@ -27,6 +29,7 @@ public slots:
     bool isJsonLoaded() const;
     void startSimulation();
     bool hasSimulationStarted() const;
+    bool isRequestInProgress() const;
     void updateBoxInfo(const QString &boxInfo);
     void clearBoxInfo();
 
@@ -46,11 +49,17 @@ signals:
     void simulationStarted();
     void boxInfoUpdated(const QString &boxInfo);
     void boxInfoCleared();
+    void isRequestInProgressChanged();
+    void serverResponseChanged();
 
 private slots:
     void onFullScreen3DWindowClosed();
 
 private:
+    NetworkHelper m_networkHelper;
+    QJsonObject m_serverResponse;
+    bool m_isRequestInProgress = false;
+
     std::unique_ptr<ThreeDSpaceView> m_3dView;
     QPointer<QQmlContext> m_context;
     QPointer<FullScreen3DWindow> m_secondWindow;

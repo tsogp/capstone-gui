@@ -45,52 +45,38 @@ QVariantList ThreeDSpaceView::getSpawnedBoxes() {
     return list;
 }
 
-// TODO: Revise after integration with the algorithm
-void ThreeDSpaceView::processOutputBoxesJsonFile(const QUrl &fileUrl) {
-    // Assumes the returned file is a valid JSON file containing 
-    // an array of BoxData objects, thus no error handling for file existence
-    QFile file(fileUrl.toLocalFile());
-    if (!file.open(QIODevice::ReadOnly)) {
-        qWarning("Could not open JSON file.");
+void ThreeDSpaceView::processOutputBoxesJson(const QJsonObject &response) {
+    if (!response.contains("placed_boxes") || !response["placed_boxes"].isArray()) {
+        qWarning() << "Invalid response: no placed_boxes array.";
         return;
     }
 
-    QByteArray data = file.readAll();
-    file.close();
-
-    QJsonParseError parseError;
-    QJsonDocument doc = QJsonDocument::fromJson(data, &parseError);
-    if (parseError.error != QJsonParseError::NoError) {
-        qWarning() << "JSON Parse Error:" << parseError.errorString();
-        return;
-    }
-    // Parse the JSON array into BoxData objects
-    /* NOTE:
-    The JSON output file has the x as width, y as length, z as height.
-    In current 3D space (as of 8/11/2025), x is up-down, y is in-out, z is left-right.
-    "Length is the longer side", hence 
-        outputY = palletX = length, 
-        outputZ = palletY = height, 
-        outputX = palletZ = width.
-    */
+    QJsonArray placedArray = response["placed_boxes"].toArray();
     QVector<BoxData> parsedOutputBoxes;
 
-    for (const QJsonValue &val : doc.array()) {
+    for (const QJsonValue &val : placedArray) {
+        if (!val.isObject()) {
+            qWarning() << "Invalid placed_boxes entry (not an object)";
+            continue;
+        }
+
         QJsonObject obj = val.toObject();
-        
-        BoxData box =
-            BoxData(obj["id"].toInt(),
-                    obj["weight"].toDouble(),
-                    obj["max_load"].toInt(),
-                    QVector3D(obj["y"].toInt(), obj["z"].toInt(), obj["x"].toInt()), 
-                    QVector3D(0, 0, 0),                                              // Placeholder for rotation
-                    QVector3D(1, 1, 1),                                           // Placeholder for scale factor
-                    QVector3D(obj["l"].toInt(), obj["h"].toInt(), obj["w"].toInt()));
+
+        BoxData box(
+            obj["id"].toInt(),
+            obj["weight"].toDouble(),
+            obj["max_load"].toDouble(),
+            QVector3D(obj["y"].toDouble(), obj["z"].toDouble(), obj["x"].toDouble()),
+            QVector3D(0, 0, 0),
+            QVector3D(1, 1, 1),
+            QVector3D(obj["l"].toDouble(), obj["h"].toDouble(), obj["w"].toDouble())
+        );
 
         parsedOutputBoxes.append(box);
     }
 
     setOutputBoxes(parsedOutputBoxes);
+    qDebug() << "Done";
 }
 
 void ThreeDSpaceView::setOutputBoxes(const QVector<BoxData> &boxes) {
@@ -98,10 +84,6 @@ void ThreeDSpaceView::setOutputBoxes(const QVector<BoxData> &boxes) {
 }
 
 void ThreeDSpaceView::select3DBox(int boxId) {
-    if (boxId == -1) {
-
-    }
-
     for (const BoxData &box : m_outputBoxes) {
         if (box.m_id == boxId) {
             QString info = QString("Box ID: %1\n"

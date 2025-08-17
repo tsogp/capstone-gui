@@ -18,6 +18,8 @@ qt_add_executable(appFullScreen3DView
     src/mainwindow.cpp
     src/3d.cpp
     src/boxdata.cpp
+        src/networkhelper.cpp
+        src/networkhelper.h
 )
 
 file(GLOB_RECURSE ASSET_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} CONFIGURE_DEPENDS assets/*)

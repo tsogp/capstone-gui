@@ -12,6 +12,7 @@
 #include <qdebug.h>
 #include <qobject.h>
 #include <qtmetamacros.h>
+#include <QTimer>
 
 #define MAINWINDOW_URL "qrc:/FullScreen3DView/qml/Mainscreen.qml"
 #define WINDOW_NAME "MainWindow"
@@ -29,6 +30,30 @@ MainWindow::MainWindow() {
     m_3dView = std::make_unique<ThreeDSpaceView>(m_context, m_context);
 
     connect(m_secondWindow, &FullScreen3DWindow::closed, this, &MainWindow::onFullScreen3DWindowClosed);
+
+    connect(&m_networkHelper, &NetworkHelper::requestFinished,
+            this, [this](const QJsonObject &response) {
+                m_isRequestInProgress = false;
+                emit isRequestInProgressChanged();
+
+                m_serverResponse = response;
+                emit serverResponseChanged();
+                if (m_3dView != nullptr) {
+                    m_3dView->processOutputBoxesJson(response);
+                }
+
+                qDebug() << "Server placed_boxes:" << response["placed_boxes"];
+                qDebug() << "Server unplaced_boxes:" << response["unplaced_boxes"];
+            });
+
+    connect(&m_networkHelper, &NetworkHelper::requestError,
+            this, [this](const QString &error) {
+                m_isRequestInProgress = false;
+                emit isRequestInProgressChanged();
+                m_jsonErrorMessage = "Network error: " + error;
+                qDebug() << m_jsonErrorMessage;
+                emit jsonErrorMessageChanged();
+            });
 }
 
 void MainWindow::loadMainQml() {
@@ -156,11 +181,11 @@ void MainWindow::processBoxesJsonFile(const QUrl &fileUrl) {
     QJsonDocument doc = QJsonDocument::fromJson(data, &error);
     file.close();
 
-
     if (error.error != QJsonParseError::NoError) {
         fail("JSON parse error: " + error.errorString());
         return;
-    } else if (!doc.isObject()) {
+    }
+    if (!doc.isObject()) {
         fail("Incorrect format: JSON is not an object.");
         return;
     }
@@ -171,46 +196,56 @@ void MainWindow::processBoxesJsonFile(const QUrl &fileUrl) {
         return;
     }
 
-    
     QJsonArray boxArray = root["boxes"].toArray();
-    QVector<BoxData> parsedBoxes;
     QList<QString> invalidBoxes;
-
     for (const QJsonValue &val : boxArray) {
         if (!val.isObject()) {
-            // TODO: handle invalid objects
-            invalidBoxes.append(QStringLiteral("{ /* Invalid entry: not an object */ }"));
+            invalidBoxes.append(QStringLiteral("{ /* Not an object */ }"));
             continue;
         }
 
         QJsonObject obj = val.toObject();
-        bool ok = obj.contains("id") && obj.contains("w") && obj.contains("l") && obj.contains("h") &&
-                  obj.contains("weight") && obj.contains("max_load");
+        bool ok = obj.contains("id") &&
+                  obj.contains("w") &&
+                  obj.contains("l") &&
+                  obj.contains("h") &&
+                  obj.contains("weight") &&
+                  obj.contains("max_load");
 
         if (!ok) {
             invalidBoxes.append(QString::fromUtf8(QJsonDocument(obj).toJson(QJsonDocument::Compact)));
-            continue;
         }
-
-        BoxData b = BoxData(obj["id"].toInt(),
-                            obj["weight"].toDouble(),
-                            obj["max_load"].toInt(),
-                            QVector3D(0, 0, 0),
-                            QVector3D(0, 0, 0),
-                            QVector3D(0, 0, 0),
-                            QVector3D(obj["l"].toDouble(), obj["h"].toDouble(), obj["w"].toDouble()));
-        parsedBoxes.append(b);
     }
 
-    m_inputBoxes = parsedBoxes;
-    m_invalidBoxes = invalidBoxes;
+    if (!invalidBoxes.isEmpty()) {
+        fail(QStringLiteral("Invalid box entries: %1").arg(invalidBoxes.join(", ")));
+        return;
+    }
+
     m_rawJson = QString::fromUtf8(data);
     m_jsonErrorMessage.clear();
     m_isJsonLoaded = true;
     emit jsonErrorMessageChanged();
     emit isJsonLoadedChanged();
-    qDebug() << "Loaded" << m_inputBoxes.size() << "valid boxes,"
-             << m_invalidBoxes.size() << "invalid entries.";
+
+    m_isRequestInProgress = true;
+    emit isRequestInProgressChanged();
+    qDebug() << "Sending request";
+
+    QJsonObject requestJson;
+    QJsonObject palletType;
+    palletType["w"] = 80;
+    palletType["l"] = 120;
+    palletType["h"] = 144;
+    palletType["max_total_load"] = 1000;
+
+    requestJson["pallet_type"] = palletType;
+    requestJson["boxes"] = root["boxes"];
+    requestJson["generations"] = 1;
+
+    QTimer::singleShot(0, this, [=]() {
+        m_networkHelper.sendPutRequest("http://127.0.0.1:8000/calculate_placement", requestJson);
+    });
 }
 
 bool MainWindow::isJsonLoaded() const {
@@ -221,6 +256,10 @@ void MainWindow::startSimulation() {
     // Assuming the simulation starts, and algorithm begins
     m_hasSimulationStarted = true;
     emit simulationStarted();
+}
+
+bool MainWindow::isRequestInProgress() const {
+    return m_isRequestInProgress;
 }
 
 bool MainWindow::hasSimulationStarted() const {

@@ -40,7 +40,7 @@ public:
 public slots:
     QVariant getNewBox();
     QVariantList getSpawnedBoxes();
-    void processOutputBoxesJsonFile(const QUrl &fileUrl);
+    void processOutputBoxesJson(const QJsonObject &response);
     void select3DBox(int boxId);
 signals:
     void currentModelSourceChanged(const QString &src);

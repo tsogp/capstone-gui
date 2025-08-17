@@ -15,6 +15,8 @@ Window {
     visible: true
     title: qsTr("Load file")
 
+    property bool isLoading: mainWindow.isRequestInProgress
+
     Connections {
         target: mainWindow
 
@@ -35,6 +37,11 @@ Window {
 
         function onBoxInfoCleared() {
             txtBoxInfo.text = qsTr("Simulation started. Click on boxes to interact with them.");
+        }
+
+        function onIsRequestInProgressChanged() {
+            console.log("here", mainWindow.isRequestInProgress);
+            isLoading = mainWindow.isRequestInProgress;
         }
     }
 
@@ -98,6 +105,7 @@ Window {
 
                         Button {
                             id: btFullscreen
+                            enabled: !isLoading
                             anchors.top: halfScreen3DSpace.top
                             anchors.topMargin: 20
                             anchors.right: halfScreen3DSpace.right
@@ -109,7 +117,6 @@ Window {
                             icon.source: "qrc:/FullScreen3DView/assets/fullscreen-24.png"
                             display: AbstractButton.IconOnly
                             Layout.alignment: Qt.AlignVCenter
-                            // TODO: replace with actual value
                             onClicked: mainWindow.openFullScreen3DWindow("Preview session #321")
                         }
                     }
@@ -160,29 +167,19 @@ Window {
 
                         ComboBox {
                             id: cbPallet
+                            enabled: !isLoading
                             Layout.preferredWidth: parent.width
                             Layout.preferredHeight: 30
                             editable: false
                             model: ListModel {
-                                ListElement {
-                                    text: "Euro"
-                                }
-                                ListElement {
-                                    text: "Industrial"
-                                }
-                                ListElement {
-                                    text: "Asia"
-                                }
+                                ListElement { text: "Euro" }
+                                ListElement { text: "Industrial" }
+                                ListElement { text: "Asia" }
                             }
                             font.pixelSize: 16
                             Layout.fillWidth: true
-                            onActivated: {
-                                mainWindow.updatePalletInfo(currentText);
-                            }
-
-                            Component.onCompleted: {
-                                mainWindow.updatePalletInfo(currentText);
-                            }
+                            onActivated: mainWindow.updatePalletInfo(currentText)
+                            Component.onCompleted: mainWindow.updatePalletInfo(currentText)
                         }
 
                         Text {
@@ -210,13 +207,11 @@ Window {
                                 font.bold: true
                             }
 
-                            Item {
-                                Layout.fillWidth: true
-                                Layout.preferredHeight: 10
-                            }
+                            Item { Layout.fillWidth: true; Layout.preferredHeight: 10 }
 
                             Button {
                                 id: roundButton
+                                enabled: !isLoading
                                 icon.height: 24
                                 icon.width: 24
                                 icon.source: "qrc:/FullScreen3DView/assets/info-24.png"
@@ -230,14 +225,12 @@ Window {
 
                         Button {
                             id: btBrowseFiles
-                            objectName: "btBrowseFiles"
+                            enabled: !isLoading
                             Layout.fillWidth: true
                             text: qsTr("Browse")
                             font.pixelSize: 16
                             icon.source: "qrc:/FullScreen3DView/assets/folder-24.png"
-                            onClicked: {
-                                inputBoxFileDialog.open();
-                            }
+                            onClicked: inputBoxFileDialog.open()
                         }
 
                         FileDialog {
@@ -246,7 +239,6 @@ Window {
                             nameFilters: ["JSON files (*.json)"]
                             fileMode: FileDialog.OpenFile
                             onAccepted: {
-                                console.log("Selected file:", inputBoxFileDialog.selectedFile)
                                 mainWindow.processBoxesJsonFile(inputBoxFileDialog.selectedFile)
                             }
                         }
@@ -262,14 +254,12 @@ Window {
 
                         Button {
                             text: "Preview JSON"
-                            enabled: mainWindow.isJsonLoaded
+                            enabled: mainWindow.isJsonLoaded && !isLoading
                             onClicked: {
                                 const component = Qt.createComponent("qrc:/FullScreen3DView/qml/PreviewWindow.qml");
                                 if (component.status === Component.Ready) {
                                     const preview = component.createObject(null);
-                                    if (!preview) {
-                                        console.log("Failed to create PreviewWindow");
-                                    }
+                                    if (!preview) console.log("Failed to create PreviewWindow");
                                 } else {
                                     console.log("Failed to load PreviewWindow.qml:", component.errorString());
                                 }
@@ -277,43 +267,34 @@ Window {
                         }
                     }
 
-                    Item {
-                        Layout.fillHeight: true
-                    }
+                    Item { Layout.fillHeight: true }
 
                     RowLayout {
                         id: rowButtons
                         Layout.fillWidth: true
                         Layout.preferredHeight: btStartSimulation.height
-                        spacing: 0
 
-                        Item {
-                            Layout.fillWidth: true
+                        Item { Layout.fillWidth: true }
+
+                        BusyIndicator {
+                            id: loaderIndicator
+                            running: isLoading
+                            visible: isLoading
+                            Layout.preferredWidth: btStartSimulation.Layout.preferredWidth
+                            Layout.preferredHeight: btStartSimulation.Layout.preferredHeight
+                            Layout.alignment: Qt.AlignVCenter
                         }
 
                         Button {
                             id: btStartSimulation
-                            enabled: mainWindow.isJsonLoaded
+                            enabled: mainWindow.isJsonLoaded && !isLoading
                             Layout.preferredWidth: 200
                             Layout.preferredHeight: 40
                             text: qsTr("Start simulation")
                             font.pixelSize: 16
-                            // TODO: Start the simulation ONLY AFTER algo is finished
                             onClicked: {
-                                mainWindow.startSimulation();
-                                outputBoxFileDialog.open();
-                            }
-                        }
-
-                        // TODO: Remove after algo integration is done
-                        FileDialog {
-                            id: outputBoxFileDialog
-                            title: "Select an OUTPUT JSON file"
-                            nameFilters: ["JSON files (*.json)"]
-                            fileMode: FileDialog.OpenFile
-                            onAccepted: {
-                                console.log("Selected file:", outputBoxFileDialog.selectedFile)
-                                threeDSpaceView.processOutputBoxesJsonFile(outputBoxFileDialog.selectedFile)
+                                mainWindow.startSimulation()
+                                outputBoxFileDialog.open()
                             }
                         }
                     }
