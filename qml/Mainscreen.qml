@@ -33,8 +33,8 @@ Window {
             txtBoxInfo.visible = true;
             txtBoxInfo.text = qsTr("Simulation started. Click on boxes to interact with them.");
 
+            rowResult.visible = true;
             txtResultStats.visible = true;
-            txtResult.visible = true;
         }
 
         function onResultStatsReceived(resultStats) {
@@ -177,15 +177,35 @@ Window {
                         visible: false
                     }
 
-                    Text {
-                        id: txtResult
-                        color: "#000000"
-                        text: "Result"
-                        font.pixelSize: 18
-                        font.bold: true
+                    RowLayout{
+                        id: rowResult
                         visible: false
-                    }
 
+                        Text {
+                            id: txtResult
+                            color: "#000000"
+                            text: "Result"
+                            font.pixelSize: 18
+                            font.bold: true
+                        }
+
+                        Item {
+                            Layout.fillWidth: true
+                        }
+
+                        Button {
+                            id: resultTooltip
+                            icon.height: 24
+                            icon.width: 24
+                            icon.source: "qrc:/FullScreen3DView/assets/info-24.png"
+                            icon.color: "#006dd9"
+                            display: AbstractButton.IconOnly
+                            ToolTip.visible: hovered
+                            ToolTip.delay: 0
+                            ToolTip.text: "Volume utilization is the volume of all boxes divided by total volume of pallet. The higher the ratio the higher the score.\nGlobal air exposure ratio is the total amount of gaps between boxes. The lesser the gaps the higher the score.\nCenter of gravity: the center of gravity of all the boxes relative to the pallet. The closer it is to the bottom and middle, the higher the score.\n\nFitness score is a weighted score of all the scores above"
+                        }
+                    }
+                    
                     Text {
                         id: txtResultStats
                         color: "#000000"
