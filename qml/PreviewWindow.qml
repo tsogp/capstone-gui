@@ -55,32 +55,6 @@ Window {
                 }
             }
 
-            // Valid Boxes Panel
-            ColumnLayout {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                spacing: 10
-
-                Text {
-                    text: "Valid Boxes"
-                    font.pixelSize: 18
-                    font.bold: true
-                    color: "#444"
-                }
-
-                ScrollView {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-
-                    Text {
-                        text: mainWindow.getValidBoxesSummary()
-                        wrapMode: Text.Wrap
-                        font.pixelSize: 14
-                        color: "green"
-                    }
-                }
-            }
-
             // Invalid Boxes Panel
             ColumnLayout {
                 Layout.fillWidth: true

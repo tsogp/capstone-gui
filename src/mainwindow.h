@@ -18,13 +18,13 @@ class MainWindow : public QQmlApplicationEngine {
     Q_PROPERTY(bool isJsonLoaded READ isJsonLoaded NOTIFY isJsonLoadedChanged)
     Q_PROPERTY(bool hasSimulationStarted READ hasSimulationStarted NOTIFY simulationStarted)
     Q_PROPERTY(bool isRequestInProgress READ isRequestInProgress NOTIFY isRequestInProgressChanged)
+    Q_PROPERTY(int progressValue READ progressValue WRITE setProgressValue NOTIFY progressValueChanged)
 
 public slots:
     void openFullScreen3DWindow(const QString &message);
     void updatePalletInfo(const QString &name);
     void processBoxesJsonFile(const QUrl &fileUrl);
     QString getRawJson() const;
-    QString getValidBoxesSummary() const;
     QString getInvalidBoxesSummary() const;
     bool isJsonLoaded() const;
     void startSimulation();
@@ -38,8 +38,10 @@ public:
 
     void loadMainQml();
     bool isFullScreenViewOpen() const { return m_isFullScreenViewOpen; }
-    const QVector<BoxData> &inputBoxes() const { return m_inputBoxes; }
+    const QJsonArray &inputBoxes() const { return m_inputBoxes; }
     QString jsonErrorMessage() const { return m_jsonErrorMessage;}
+    int progressValue() const { return m_progressValue; }
+    void setProgressValue(int value);
 
 signals:
     void palletInfoUpdated(const QString &info);
@@ -51,6 +53,8 @@ signals:
     void boxInfoCleared();
     void isRequestInProgressChanged();
     void serverResponseChanged();
+    void progressValueChanged();
+    void resultStatsReceived(const QString &result);
 
 private slots:
     void onFullScreen3DWindowClosed();
@@ -65,12 +69,13 @@ private:
     QPointer<FullScreen3DWindow> m_secondWindow;
     QJsonArray palletArray;
     bool m_isFullScreenViewOpen = false;
-    QVector<BoxData> m_inputBoxes;
+    QJsonArray m_inputBoxes;
     QList<QString> m_invalidBoxes;
     QString m_rawJson;
     QString m_jsonErrorMessage;
     bool m_isJsonLoaded = false;
     bool m_hasSimulationStarted = false;
+    int m_progressValue = 0;
 
     void loadPalletsJson();
 };

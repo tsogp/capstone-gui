@@ -17,6 +17,7 @@
 #define MAINWINDOW_URL "qrc:/FullScreen3DView/qml/Mainscreen.qml"
 #define WINDOW_NAME "MainWindow"
 #define DEBUG_PREFIX "[" WINDOW_NAME "]:"
+#define serverURL "http://127.0.0.1:8000"
 
 MainWindow::MainWindow() {
     loadPalletsJson();
@@ -31,29 +32,59 @@ MainWindow::MainWindow() {
 
     connect(m_secondWindow, &FullScreen3DWindow::closed, this, &MainWindow::onFullScreen3DWindowClosed);
 
-    connect(&m_networkHelper, &NetworkHelper::requestFinished,
-            this, [this](const QJsonObject &response) {
-                m_isRequestInProgress = false;
-                emit isRequestInProgressChanged();
+    connect(&m_networkHelper, &NetworkHelper::jobStarted, this, [this](const QString &jobId) {
+        m_isRequestInProgress = true;
+        emit isRequestInProgressChanged();
+        qDebug() << "Placement job started with ID:" << jobId;
 
-                m_serverResponse = response;
-                emit serverResponseChanged();
-                if (m_3dView != nullptr) {
-                    m_3dView->processOutputBoxesJson(response);
-                }
+        // Begin polling progress
+        m_networkHelper.pollProgress(QString(serverURL), 2000);
+    });
 
-                qDebug() << "Server placed_boxes:" << response["placed_boxes"];
-                qDebug() << "Server unplaced_boxes:" << response["unplaced_boxes"];
-            });
+    connect(&m_networkHelper, &NetworkHelper::progressUpdated, this, [this](int progress, const QString &status) {
+        setProgressValue(progress);
+        emit progressValueChanged();
+        qDebug() << "Progress:" << progress << "% Status:" << status;
 
-    connect(&m_networkHelper, &NetworkHelper::requestError,
-            this, [this](const QString &error) {
-                m_isRequestInProgress = false;
-                emit isRequestInProgressChanged();
-                m_jsonErrorMessage = "Network error: " + error;
-                qDebug() << m_jsonErrorMessage;
-                emit jsonErrorMessageChanged();
-            });
+        if (status == "done") {
+            // Fetch final result automatically
+            m_networkHelper.fetchResult(QString(serverURL));
+        }
+    });
+
+    connect(&m_networkHelper, &NetworkHelper::jobFinished, this, [this](const QString &jobId) {
+        m_isRequestInProgress = false;
+        emit isRequestInProgressChanged();
+
+        qDebug() << "Job finished with ID:" << jobId;
+    });
+
+    connect(&m_networkHelper, &NetworkHelper::resultReceived, this, [this](const QJsonObject &result) {
+        m_serverResponse = result;
+        emit serverResponseChanged();
+        if (m_3dView != nullptr) {
+            m_3dView->processOutputBoxesJson(result);
+        }
+
+        QString resultStats = QString("Generations: %1\nVolume utilization: %2\nGlobal air exposure ratio: %3\nCenter of gravity: %4\nFitness score: %5")
+                          .arg(result["generations"].toInt())
+                          .arg(result["volume_utilization"].toDouble())
+                          .arg(result["global_air_exposure_ratio"].toDouble())
+                          .arg(result["center_of_gravity"].toString())
+                          .arg(result["fitness_score"].toDouble());
+        emit resultStatsReceived(resultStats);
+
+        qDebug() << "Server placed_boxes:" << result["placed_boxes"];
+        qDebug() << "Server unplaced_boxes:" << result["unplaced_boxes"];
+    });
+
+    connect(&m_networkHelper, &NetworkHelper::requestError, this, [this](const QString &error) {
+        m_isRequestInProgress = false;
+        emit isRequestInProgressChanged();
+        m_jsonErrorMessage = "Network error: " + error;
+        qDebug() << m_jsonErrorMessage;
+        emit jsonErrorMessageChanged();
+    });
 }
 
 void MainWindow::loadMainQml() {
@@ -134,20 +165,6 @@ QString MainWindow::getRawJson() const {
     return m_rawJson;
 }
 
-QString MainWindow::getValidBoxesSummary() const {
-    QString summary;
-    for (const auto &box : m_inputBoxes) {
-        summary += QString("Box %1: %2x%3x%4, weight %5, maxLoad %6\n")
-                       .arg(box.m_id)
-                       .arg(box.m_dimensions.y())
-                       .arg(box.m_dimensions.x())
-                       .arg(box.m_dimensions.z())
-                       .arg(box.m_weight)
-                       .arg(box.m_maxLoad);
-    }
-    return summary;
-}
-
 QString MainWindow::getInvalidBoxesSummary() const {
     if (m_invalidBoxes.isEmpty())
         return "No invalid boxes found.";
@@ -205,12 +222,10 @@ void MainWindow::processBoxesJsonFile(const QUrl &fileUrl) {
         }
 
         QJsonObject obj = val.toObject();
-        bool ok = obj.contains("id") &&
-                  obj.contains("w") &&
-                  obj.contains("l") &&
-                  obj.contains("h") &&
-                  obj.contains("weight") &&
-                  obj.contains("max_load");
+        bool ok = obj.contains("id") && obj.contains("w") && obj.contains("l") && obj.contains("h") &&
+                  obj.contains("weight") && obj.contains("max_load");
+
+        m_inputBoxes.append(obj);
 
         if (!ok) {
             invalidBoxes.append(QString::fromUtf8(QJsonDocument(obj).toJson(QJsonDocument::Compact)));
@@ -241,10 +256,11 @@ void MainWindow::processBoxesJsonFile(const QUrl &fileUrl) {
 
     requestJson["pallet_type"] = palletType;
     requestJson["boxes"] = root["boxes"];
-    requestJson["generations"] = 1;
+    requestJson["generations"] = 5;
 
+    // Start algorithm, and process the placement of boxes
     QTimer::singleShot(0, this, [=]() {
-        m_networkHelper.sendPutRequest("http://127.0.0.1:8000/calculate_placement", requestJson);
+        m_networkHelper.sendPostRequest("http://127.0.0.1:8000/calculate_placement", requestJson);
     });
 }
 
@@ -253,7 +269,7 @@ bool MainWindow::isJsonLoaded() const {
 }
 
 void MainWindow::startSimulation() {
-    // Assuming the simulation starts, and algorithm begins
+    // Simulation starts, algorithm has finished
     m_hasSimulationStarted = true;
     emit simulationStarted();
 }
@@ -274,6 +290,13 @@ void MainWindow::updateBoxInfo(const QString &boxInfo) {
 
 void MainWindow::clearBoxInfo() {
     emit boxInfoCleared();
+}
+
+void MainWindow::setProgressValue(int value) {
+    if (m_progressValue != value) {
+        m_progressValue = value;
+        emit progressValueChanged();
+    }
 }
 
 void MainWindow::onFullScreen3DWindowClosed() {

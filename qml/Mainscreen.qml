@@ -16,6 +16,7 @@ Window {
     title: qsTr("Load file")
 
     property bool isLoading: mainWindow.isRequestInProgress
+    property string serverURL: "http://127.0.0.1:8000"
 
     Connections {
         target: mainWindow
@@ -24,11 +25,20 @@ Window {
             txtPalletInfo.text = info;
         }
 
-        function onSimulationStarted(){
+        function onSimulationStarted(resultStats){
             choicesColLayout.visible = false;
             rowButtons.visible = false;
+
+            txtBox.visible = true;
             txtBoxInfo.visible = true;
             txtBoxInfo.text = qsTr("Simulation started. Click on boxes to interact with them.");
+
+            txtResultStats.visible = true;
+            txtResult.visible = true;
+        }
+
+        function onResultStatsReceived(resultStats) {
+            txtResultStats.text = resultStats;
         }
 
         function onBoxInfoUpdated(info) {
@@ -42,6 +52,11 @@ Window {
         function onIsRequestInProgressChanged() {
             console.log("here", mainWindow.isRequestInProgress);
             isLoading = mainWindow.isRequestInProgress;
+        }
+
+        function onProgressValueChanged(){
+            statusLabel.text = qsTr("Status: ") + mainWindow.progressValue + "%";
+            progressBar.value = mainWindow.progressValue;
         }
     }
 
@@ -146,9 +161,34 @@ Window {
                     Layout.alignment: Qt.AlignTop
 
                     Text {
+                        id: txtBox
+                        color: "#000000"
+                        text: "Box Information"
+                        font.pixelSize: 18
+                        font.bold: true
+                        visible: false
+                    }
+
+                    Text {
                         id: txtBoxInfo
                         color: "#000000"
                         text: "Currently placing {box.name}\n\nPlacement data:\n- x = {box.x}\n- y = {box.y}\n- z = {box.z}\n- Weight = {box.weight}\n- Max load capacity: {box.max_load_capacity}\n- Estimated load: {box.estiomated_load}"
+                        font.pixelSize: 16
+                        visible: false
+                    }
+
+                    Text {
+                        id: txtResult
+                        color: "#000000"
+                        text: "Result"
+                        font.pixelSize: 18
+                        font.bold: true
+                        visible: false
+                    }
+
+                    Text {
+                        id: txtResultStats
+                        color: "#000000"
                         font.pixelSize: 16
                         visible: false
                     }
@@ -183,7 +223,7 @@ Window {
                         }
 
                         Text {
-                            text: qsTr("Pallet Info:")
+                            text: qsTr("Pallet Info")
                             font.pixelSize: 17
                             font.bold: true
                         }
@@ -276,13 +316,20 @@ Window {
 
                         Item { Layout.fillWidth: true }
 
-                        BusyIndicator {
-                            id: loaderIndicator
-                            running: isLoading
+                        ColumnLayout{
                             visible: isLoading
-                            Layout.preferredWidth: btStartSimulation.Layout.preferredWidth
-                            Layout.preferredHeight: btStartSimulation.Layout.preferredHeight
-                            Layout.alignment: Qt.AlignVCenter
+
+                            Text {
+                                id: statusLabel
+                                text: "Status: Loading..."
+                            }
+
+                            ProgressBar{
+                                id: progressBar
+                                from: 0
+                                to: 100
+                                value: 0
+                            }
                         }
 
                         Button {
@@ -294,7 +341,6 @@ Window {
                             font.pixelSize: 16
                             onClicked: {
                                 mainWindow.startSimulation()
-                                outputBoxFileDialog.open()
                             }
                         }
                     }
