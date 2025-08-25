@@ -174,8 +174,8 @@ Item {
                 asynchronous: true
 
                 onLoaded: {
-                    item.position = Qt.vector3d(0, 0, 0);
-                    item.scale = Qt.vector3d(1.5, 1.5, 1.5);
+                    item.position.x = 0;
+                    item.position.z = 0;
                 }
             }
 

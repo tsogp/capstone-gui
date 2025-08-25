@@ -43,6 +43,7 @@ Node {
     Model {
         id: cube_0011
         source: "meshes/mesh.mesh"
+        scale: Qt.vector3d(1.55, 1.55, 1.55)
         materials: [wood_1_material2, wood_1_material2]
     }
 }

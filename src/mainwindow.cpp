@@ -229,8 +229,12 @@ void MainWindow::processBoxesManual(const QVariantList &boxes) {
 
     QJsonObject requestJson;
     QJsonObject palletType;
-    palletType["w"] = 80;
-    palletType["l"] = 120;
+
+    QVector3D palletData = m_3dView->palletData();
+    palletType["w"] = palletData.z();
+    palletType["l"] = palletData.x();
+    
+    // TODO: pass height and max total load
     palletType["h"] = 144;
     palletType["max_total_load"] = 1000;
 
@@ -318,11 +322,13 @@ void MainWindow::processBoxesJsonFile(const QUrl &fileUrl) {
 
     QJsonObject requestJson;
     QJsonObject palletType;
-    palletType["w"] = 80;
-    palletType["l"] = 120;
+    QVector3D palletData = m_3dView->palletData();
+    palletType["w"] = palletData.z();
+    palletType["l"] = palletData.x();
+    
+    // TODO: pass height and max total load
     palletType["h"] = 144;
     palletType["max_total_load"] = 1000;
-
     requestJson["pallet_type"] = palletType;
     requestJson["boxes"] = root["boxes"];
     requestJson["generations"] = 1;
