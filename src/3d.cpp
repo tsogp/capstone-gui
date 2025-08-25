@@ -75,6 +75,10 @@ void ThreeDSpaceView::processOutputBoxesJson(const QJsonObject &response) {
         parsedOutputBoxes.append(box);
     }
 
+    std::sort(parsedOutputBoxes.begin(), parsedOutputBoxes.end(), [](const BoxData& a, const BoxData& b) { 
+        return a.m_position.y() < b.m_position.y();  
+    });
+
     setOutputBoxes(parsedOutputBoxes);
     qDebug() << "Done";
 }
