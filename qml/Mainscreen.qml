@@ -18,6 +18,10 @@ Window {
     property bool isLoading: mainWindow.isRequestInProgress
     property string serverURL: "http://127.0.0.1:8000"
 
+    AddBoxesForSessionDialog {
+        id: addBoxesForSessionDialog
+    }
+
     Connections {
         target: mainWindow
 
@@ -25,7 +29,7 @@ Window {
             txtPalletInfo.text = info;
         }
 
-        function onSimulationStarted(resultStats){
+        function onSimulationStarted(resultStats) {
             choicesColLayout.visible = false;
             rowButtons.visible = false;
 
@@ -54,7 +58,7 @@ Window {
             isLoading = mainWindow.isRequestInProgress;
         }
 
-        function onProgressValueChanged(){
+        function onProgressValueChanged() {
             statusLabel.text = qsTr("Status: ") + mainWindow.progressValue + "%";
             progressBar.value = mainWindow.progressValue;
         }
@@ -177,7 +181,7 @@ Window {
                         visible: false
                     }
 
-                    RowLayout{
+                    RowLayout {
                         id: rowResult
                         visible: false
 
@@ -205,7 +209,7 @@ Window {
                             ToolTip.text: "Volume utilization is the volume of all boxes divided by total volume of pallet. The higher the ratio the higher the score.\nGlobal air exposure ratio is the total amount of gaps between boxes. The lesser the gaps the higher the score.\nCenter of gravity: the center of gravity of all the boxes relative to the pallet. The closer it is to the bottom and middle, the higher the score.\n\nFitness score is a weighted score of all the scores above"
                         }
                     }
-                    
+
                     Text {
                         id: txtResultStats
                         color: "#000000"
@@ -232,9 +236,15 @@ Window {
                             Layout.preferredHeight: 30
                             editable: false
                             model: ListModel {
-                                ListElement { text: "Euro" }
-                                ListElement { text: "Industrial" }
-                                ListElement { text: "Asia" }
+                                ListElement {
+                                    text: "Euro"
+                                }
+                                ListElement {
+                                    text: "Industrial"
+                                }
+                                ListElement {
+                                    text: "Asia"
+                                }
                             }
                             font.pixelSize: 16
                             Layout.fillWidth: true
@@ -255,88 +265,139 @@ Window {
                             Layout.fillWidth: true
                         }
 
-                        RowLayout {
-                            id: rowPackageList
+                        ColumnLayout {
+                            id: boxModeLayout
                             Layout.fillWidth: true
-                            spacing: 0
+                            spacing: 12
+
+                            RowLayout {
+                                spacing: 10
+                                Label {
+                                    text: qsTr("Mode:")
+                                    font.pixelSize: 16
+                                    font.bold: true
+                                }
+                                Switch {
+                                    id: modeSwitch
+                                    text: checked ? "Load from file" : "Add manually"
+                                    checked: false
+                                }
+                            }
+
+                            StackLayout {
+                                Layout.fillWidth: true
+                                currentIndex: modeSwitch.checked ? 1 : 0
+
+                                ColumnLayout {
+                                    spacing: 8
+
+                                    Button {
+                                        id: openAddBoxesSession
+                                        enabled: !isLoading
+                                        Layout.fillWidth: true
+                                        text: qsTr("Add boxes to session")
+                                        font.pixelSize: 16
+                                        onClicked: addBoxesForSessionDialog.open()
+                                    }
+                                }
+
+                                ColumnLayout {
+                                    spacing: 8
+
+                                    RowLayout {
+                                        id: rowPackageList
+                                        Layout.fillWidth: true
+                                        spacing: 0
+
+                                        Text {
+                                            id: txtPackage
+                                            text: qsTr("Load the package list")
+                                            font.pixelSize: 17
+                                            font.bold: true
+                                        }
+
+                                        Item {
+                                            Layout.fillWidth: true
+                                            Layout.preferredHeight: 10
+                                        }
+
+                                        Button {
+                                            id: roundButton
+                                            enabled: !isLoading
+                                            icon.height: 24
+                                            icon.width: 24
+                                            icon.source: "qrc:/FullScreen3DView/assets/info-24.png"
+                                            icon.color: "#006dd9"
+                                            display: AbstractButton.IconOnly
+                                            ToolTip.visible: hovered
+                                            ToolTip.delay: 0
+                                            ToolTip.text: "Expected format:\n{\n  \"boxes\": [\n    { \"w\": int, \"l\": int, \"h\": int,\n      \"weight\": float, \"max_load\": int }\n  ]\n}"
+                                        }
+                                    }
+
+                                    Button {
+                                        id: btBrowseFiles
+                                        enabled: !isLoading
+                                        Layout.fillWidth: true
+                                        text: qsTr("Browse")
+                                        font.pixelSize: 16
+                                        icon.source: "qrc:/FullScreen3DView/assets/folder-24.png"
+                                        onClicked: inputBoxFileDialog.open()
+                                    }
+
+                                    FileDialog {
+                                        id: inputBoxFileDialog
+                                        title: "Select a JSON file"
+                                        nameFilters: ["JSON files (*.json)"]
+                                        fileMode: FileDialog.OpenFile
+                                        onAccepted: {
+                                            mainWindow.processBoxesJsonFile(inputBoxFileDialog.selectedFile);
+                                        }
+                                    }
+
+                                    Button {
+                                        text: "Preview JSON"
+                                        enabled: mainWindow.isJsonLoaded && !isLoading
+                                        onClicked: {
+                                            const component = Qt.createComponent("qrc:/FullScreen3DView/qml/PreviewWindow.qml");
+                                            if (component.status === Component.Ready) {
+                                                const preview = component.createObject(null);
+                                                if (!preview)
+                                                    console.log("Failed to create PreviewWindow");
+                                            } else {
+                                                console.log("Failed to load PreviewWindow.qml:", component.errorString());
+                                            }
+                                        }
+                                    }
+                                }
+                            }
 
                             Text {
-                                id: txtPackage
-                                text: qsTr("Load the package list")
-                                font.pixelSize: 17
+                                id: jsonErrorText
+                                width: Layout.fillWidth
+                                text: mainWindow.jsonErrorMessage
+                                color: "red"
                                 font.bold: true
-                            }
-
-                            Item { Layout.fillWidth: true; Layout.preferredHeight: 10 }
-
-                            Button {
-                                id: roundButton
-                                enabled: !isLoading
-                                icon.height: 24
-                                icon.width: 24
-                                icon.source: "qrc:/FullScreen3DView/assets/info-24.png"
-                                icon.color: "#006dd9"
-                                display: AbstractButton.IconOnly
-                                ToolTip.visible: hovered
-                                ToolTip.delay: 0
-                                ToolTip.text: "Expected format:\n{\n  \"boxes\": [\n    { \"w\": int, \"l\": int, \"h\": int,\n      \"weight\": float, \"max_load\": int }\n  ]\n}"
-                            }
-                        }
-
-                        Button {
-                            id: btBrowseFiles
-                            enabled: !isLoading
-                            Layout.fillWidth: true
-                            text: qsTr("Browse")
-                            font.pixelSize: 16
-                            icon.source: "qrc:/FullScreen3DView/assets/folder-24.png"
-                            onClicked: inputBoxFileDialog.open()
-                        }
-
-                        FileDialog {
-                            id: inputBoxFileDialog
-                            title: "Select a JSON file"
-                            nameFilters: ["JSON files (*.json)"]
-                            fileMode: FileDialog.OpenFile
-                            onAccepted: {
-                                mainWindow.processBoxesJsonFile(inputBoxFileDialog.selectedFile)
-                            }
-                        }
-
-                        Text {
-                            id: jsonErrorText
-                            text: mainWindow.jsonErrorMessage
-                            color: "red"
-                            font.bold: true
-                            visible: text.length > 0
-                            wrapMode: Text.Wrap
-                        }
-
-                        Button {
-                            text: "Preview JSON"
-                            enabled: mainWindow.isJsonLoaded && !isLoading
-                            onClicked: {
-                                const component = Qt.createComponent("qrc:/FullScreen3DView/qml/PreviewWindow.qml");
-                                if (component.status === Component.Ready) {
-                                    const preview = component.createObject(null);
-                                    if (!preview) console.log("Failed to create PreviewWindow");
-                                } else {
-                                    console.log("Failed to load PreviewWindow.qml:", component.errorString());
-                                }
+                                visible: text.length > 0
+                                wrapMode: Text.Wrap
                             }
                         }
                     }
 
-                    Item { Layout.fillHeight: true }
+                    Item {
+                        Layout.fillHeight: true
+                    }
 
                     RowLayout {
                         id: rowButtons
                         Layout.fillWidth: true
                         Layout.preferredHeight: btStartSimulation.height
 
-                        Item { Layout.fillWidth: true }
+                        Item {
+                            Layout.fillWidth: true
+                        }
 
-                        ColumnLayout{
+                        ColumnLayout {
                             visible: isLoading
 
                             Text {
@@ -344,7 +405,7 @@ Window {
                                 text: "Status: Loading..."
                             }
 
-                            ProgressBar{
+                            ProgressBar {
                                 id: progressBar
                                 from: 0
                                 to: 100
@@ -360,7 +421,7 @@ Window {
                             text: qsTr("Start simulation")
                             font.pixelSize: 16
                             onClicked: {
-                                mainWindow.startSimulation()
+                                mainWindow.startSimulation();
                             }
                         }
                     }

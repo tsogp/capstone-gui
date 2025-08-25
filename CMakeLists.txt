@@ -32,6 +32,7 @@ qt_add_qml_module(appFullScreen3DView
     qml/Mainscreen.qml
     qml/ThreeDView.qml
     qml/PreviewWindow.qml
+    qml/AddBoxesForSessionDialog.qml
     RESOURCES
     ${ASSET_FILES}
     data/pallet.json

@@ -8,6 +8,7 @@
 #include <QQmlComponent>
 #include <QQmlContext>
 #include <QQuickWindow>
+#include <cstddef>
 #include <memory>
 #include <qdebug.h>
 #include <qobject.h>
@@ -176,6 +177,74 @@ QString MainWindow::getInvalidBoxesSummary() const {
     return summary;
 }
 
+void MainWindow::processBoxesManual(const QVariantList &boxes) {
+    auto fail = [&](const QString &msg) {
+        m_jsonErrorMessage = msg;
+        m_isJsonLoaded = false;
+        emit jsonErrorMessageChanged();
+        emit isJsonLoadedChanged();
+        qWarning() << "Manual JSON error:" << msg;
+    };
+
+    if (boxes.isEmpty()) {
+        fail("No boxes provided.");
+        return;
+    }
+
+    QJsonArray boxArray;
+    int i = 1;
+    for (const QVariant &v : boxes) {
+        QJsonObject obj = v.toJsonObject();
+        int box_amount = obj["amount"].toInt();
+
+        for (int j = 0; j < box_amount; ++j) {
+            bool ok = obj.contains("w") && obj.contains("l") && obj.contains("h") &&
+                      obj.contains("weight") && obj.contains("max_load");
+    
+            obj["id"] = i++;
+            obj.remove("amount");
+    
+            if (!ok) {
+                fail("Invalid box entry: " + QString::fromUtf8(QJsonDocument(obj).toJson(QJsonDocument::Compact)));
+                return;
+            }
+    
+            // Append amount times if needed, or just push one entry
+            boxArray.append(obj);
+        }
+    }
+
+    QJsonObject root;
+    root["boxes"] = boxArray;
+
+    m_rawJson = QString::fromUtf8(QJsonDocument(root).toJson(QJsonDocument::Compact));
+    m_jsonErrorMessage.clear();
+    m_isJsonLoaded = true;
+    emit jsonErrorMessageChanged();
+    emit isJsonLoadedChanged();
+
+    m_isRequestInProgress = true;
+    emit isRequestInProgressChanged();
+    qDebug() << "Sending manual boxes request";
+
+    QJsonObject requestJson;
+    QJsonObject palletType;
+    palletType["w"] = 80;
+    palletType["l"] = 120;
+    palletType["h"] = 144;
+    palletType["max_total_load"] = 1000;
+
+    requestJson["pallet_type"] = palletType;
+    requestJson["boxes"] = boxArray;
+    requestJson["generations"] = 1;
+
+    // Start algorithm, and process the placement of boxes
+    QTimer::singleShot(0, this, [=]() {
+        m_networkHelper.sendPostRequest("http://127.0.0.1:8000/calculate_placement", requestJson);
+    });
+}
+
+
 void MainWindow::processBoxesJsonFile(const QUrl &fileUrl) {
     QString path = fileUrl.toLocalFile();
 
@@ -256,7 +325,7 @@ void MainWindow::processBoxesJsonFile(const QUrl &fileUrl) {
 
     requestJson["pallet_type"] = palletType;
     requestJson["boxes"] = root["boxes"];
-    requestJson["generations"] = 5;
+    requestJson["generations"] = 1;
 
     // Start algorithm, and process the placement of boxes
     QTimer::singleShot(0, this, [=]() {

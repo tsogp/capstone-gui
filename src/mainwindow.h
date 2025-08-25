@@ -24,6 +24,7 @@ public slots:
     void openFullScreen3DWindow(const QString &message);
     void updatePalletInfo(const QString &name);
     void processBoxesJsonFile(const QUrl &fileUrl);
+    void processBoxesManual(const QVariantList &boxes);
     QString getRawJson() const;
     QString getInvalidBoxesSummary() const;
     bool isJsonLoaded() const;
