@@ -50,6 +50,10 @@ MainWindow::MainWindow() {
         if (status == "done") {
             // Fetch final result automatically
             m_networkHelper.fetchResult(QString(serverURL));
+            
+            // Simulation starts, algorithm has finished
+            m_hasSimulationStarted = true;
+            emit simulationStarted();
         }
     });
 
@@ -223,11 +227,7 @@ void MainWindow::processBoxesManual(const QVariantList &boxes) {
     emit jsonErrorMessageChanged();
     emit isJsonLoadedChanged();
 
-    m_isRequestInProgress = true;
     emit isRequestInProgressChanged();
-    qDebug() << "Sending manual boxes request";
-
-    QJsonObject requestJson;
     QJsonObject palletType;
 
     QVector3D palletData = m_3dView->palletData();
@@ -241,11 +241,6 @@ void MainWindow::processBoxesManual(const QVariantList &boxes) {
     requestJson["pallet_type"] = palletType;
     requestJson["boxes"] = boxArray;
     requestJson["generations"] = 1;
-
-    // Start algorithm, and process the placement of boxes
-    QTimer::singleShot(0, this, [=]() {
-        m_networkHelper.sendPostRequest("http://127.0.0.1:8000/calculate_placement", requestJson);
-    });
 }
 
 
@@ -316,11 +311,8 @@ void MainWindow::processBoxesJsonFile(const QUrl &fileUrl) {
     emit jsonErrorMessageChanged();
     emit isJsonLoadedChanged();
 
-    m_isRequestInProgress = true;
     emit isRequestInProgressChanged();
-    qDebug() << "Sending request";
 
-    QJsonObject requestJson;
     QJsonObject palletType;
     QVector3D palletData = m_3dView->palletData();
     palletType["w"] = palletData.z();
@@ -329,14 +321,12 @@ void MainWindow::processBoxesJsonFile(const QUrl &fileUrl) {
     // TODO: pass height and max total load
     palletType["h"] = 144;
     palletType["max_total_load"] = 1000;
+
     requestJson["pallet_type"] = palletType;
     requestJson["boxes"] = root["boxes"];
     requestJson["generations"] = 1;
 
-    // Start algorithm, and process the placement of boxes
-    QTimer::singleShot(0, this, [=]() {
-        m_networkHelper.sendPostRequest("http://127.0.0.1:8000/calculate_placement", requestJson);
-    });
+
 }
 
 bool MainWindow::isJsonLoaded() const {
@@ -344,9 +334,11 @@ bool MainWindow::isJsonLoaded() const {
 }
 
 void MainWindow::startSimulation() {
-    // Simulation starts, algorithm has finished
-    m_hasSimulationStarted = true;
-    emit simulationStarted();
+    qDebug() << "Sending request";
+    // Start algorithm, and process the placement of boxes
+    QTimer::singleShot(0, this, [=]() {
+        m_networkHelper.sendPostRequest("http://127.0.0.1:8000/calculate_placement", requestJson);
+    });
 }
 
 bool MainWindow::isRequestInProgress() const {

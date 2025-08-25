@@ -76,6 +76,7 @@ private:
     QString m_jsonErrorMessage;
     bool m_isJsonLoaded = false;
     bool m_hasSimulationStarted = false;
+    QJsonObject requestJson;
     int m_progressValue = 0;
 
     void loadPalletsJson();
