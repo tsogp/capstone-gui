@@ -245,8 +245,8 @@ Item {
     }
 
     function moveSlicePlane(left) {
-        const zMin = -(palletData.z / 2);
-        const zMax = (palletData.z / 2);
+        const zMin = -(palletData.z / 2) - 2.5;
+        const zMax = (palletData.z / 2) + 2.5;
 
         if (left) {
             leftPlane.position.z = zMin + (zMax - zMin) * (slideLeft / 100);
@@ -285,16 +285,18 @@ Item {
 
     function checkCollisions() {
         function checkBoxPlaneCollision(planeZ, box, positiveDirection) {
-            const halfDepth = box.dimensions.z * box.scale.z * 0.5;
+            const depth = box.dimensions.z * box.scale.z;
+
+            console.log(depth, box.position, box.dimensions, box.scale, box.position.z - depth, planeZ);
 
             // Checking if left plane has touched the left side of the box
             if (positiveDirection) {
-                const boxMinZ = box.position.z - halfDepth;
+                const boxMinZ = box.position.z - depth;
                 return planeZ >= boxMinZ;
             }
 
             // Checking if right plane has touched the right side of the box
-            const boxMaxZ = box.position.z + halfDepth;
+            const boxMaxZ = box.position.z + depth;
             return planeZ <= boxMaxZ;
         }
 
