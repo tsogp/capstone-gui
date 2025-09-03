@@ -1,4 +1,5 @@
 # ABBP – FullScreen3DView
+![demo](https://github.com/tsogp/capstone-gui/blob/master/demo.gif)
 
 ABBP is a software system designed to simulate and visualize palletizing processes in warehouses.  
 It is composed of two main components:  
