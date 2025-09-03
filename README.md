@@ -1,7 +1,7 @@
-# ABBP – FullScreen3DView
+# ABBQ – FullScreen3DView
 ![demo](https://github.com/tsogp/capstone-gui/blob/master/demo.gif)
 
-ABBP is a software system designed to simulate and visualize palletizing processes in warehouses.  
+ABBQ is a software system designed to simulate and visualize palletizing processes in warehouses.  
 It is composed of two main components:  
 
 1. **Python algorithm server** – receives a package list, validates its format, and computes an optimal placement of boxes on a pallet.  
