@@ -62,6 +62,19 @@ Window {
             statusLabel.text = qsTr("Status: ") + mainWindow.progressValue + "%";
             progressBar.value = mainWindow.progressValue;
         }
+
+        function onClearMainScreen() {
+            colRightPanel.visible = true;
+            choicesColLayout.visible = true;
+            rowButtons.visible = true;
+
+            txtBox.visible = false;
+            txtBoxInfo.visible = false;
+            txtBoxInfo.text = "";
+
+            rowResult.visible = false;
+            txtResultStats.visible = false;
+        }
     }
 
     Rectangle {
@@ -427,6 +440,18 @@ Window {
                     }
                 }
             }
+        }
+
+        Button {
+            id: restartButton
+            visible: mainWindow.hasSimulationStarted && !isLoading
+            anchors.bottom: parent.bottom
+            anchors.right: parent.right
+            anchors.bottomMargin: 20
+            anchors.rightMargin: 20
+            font.pixelSize: 16
+            text: qsTr("Complete simulation and restart")
+            onClicked: mainWindow.restartSimulation()
         }
     }
 }

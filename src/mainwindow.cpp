@@ -359,6 +359,39 @@ void MainWindow::clearBoxInfo() {
     emit boxInfoCleared();
 }
 
+void MainWindow::restartSimulation() {
+    m_hasSimulationStarted = false;
+    emit simulationStarted();
+
+    m_isRequestInProgress = false;
+    emit isRequestInProgressChanged();
+
+    m_progressValue = 0;
+    emit progressValueChanged();
+
+    m_serverResponse = QJsonObject();
+    emit serverResponseChanged();
+
+    m_rawJson.clear();
+    emit jsonErrorMessageChanged();
+
+    m_isJsonLoaded = false;
+    emit isJsonLoadedChanged();
+
+    m_inputBoxes = QJsonArray();
+    m_invalidBoxes.clear();
+
+    requestJson = QJsonObject();
+
+    emit clearMainScreen();
+
+    if (m_3dView) {
+        m_3dView->clearScene();
+    }
+
+    qDebug() << DEBUG_PREFIX << "Simulation state reset.";
+}
+
 void MainWindow::setProgressValue(int value) {
     if (m_progressValue != value) {
         m_progressValue = value;

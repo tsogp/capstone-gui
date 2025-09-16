@@ -70,6 +70,12 @@ Item {
         function onDespawnBoxRequested() {
             despawnNewestBox();
         }
+
+        function onClear3DScene() {
+            while (spawnedBoxes.length > 0) {
+                despawnNewestBox();
+            }
+        }
     }
 
     Component.onCompleted: {

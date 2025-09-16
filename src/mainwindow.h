@@ -33,6 +33,7 @@ public slots:
     bool isRequestInProgress() const;
     void updateBoxInfo(const QString &boxInfo);
     void clearBoxInfo();
+    void restartSimulation();
 
 public:
     MainWindow();
@@ -56,6 +57,7 @@ signals:
     void serverResponseChanged();
     void progressValueChanged();
     void resultStatsReceived(const QString &result);
+    void clearMainScreen();
 
 private slots:
     void onFullScreen3DWindowClosed();

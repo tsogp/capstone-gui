@@ -51,6 +51,7 @@ public:
     Q_INVOKABLE void setAutoMode(bool enabled);
     Q_INVOKABLE void spawnBoxManual();
     Q_INVOKABLE void despawnNewestBox();
+    void clearScene();
     ~ThreeDSpaceView();
 
 signals:
@@ -64,6 +65,7 @@ signals:
     void spawnBoxRequested();
     void despawnBoxRequested();
     void navigationChanged();
+    void clear3DScene();
 
 private:
     QVector<BoxData> m_outputBoxes;

@@ -253,6 +253,13 @@ void ThreeDSpaceView::setAutoMode(bool enabled) {
     emit autoModeChanged();
 }
 
+void ThreeDSpaceView::clearScene() {
+    m_spawnedBoxes.clear();
+    m_outputBoxes.clear();
+    emit clear3DScene();
+    emit navigationChanged();
+}
+
 ThreeDSpaceView::~ThreeDSpaceView() {
     writeSettings();
 }
