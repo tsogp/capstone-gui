@@ -206,7 +206,7 @@ Window {
                             display: AbstractButton.IconOnly
                             ToolTip.visible: hovered
                             ToolTip.delay: 0
-                            ToolTip.text: "Volume utilization is the volume of all boxes divided by total volume of pallet. The higher the ratio the higher the score.\nGlobal air exposure ratio is the total amount of gaps between boxes. The lesser the gaps the higher the score.\nCenter of gravity: the center of gravity of all the boxes relative to the pallet. The closer it is to the bottom and middle, the higher the score.\n\nFitness score is a weighted score of all the scores above"
+                            ToolTip.text: "Volume utilization is the volume of all boxes divided by total volume of pallet. The higher the ratio the higher the score.\n\nGlobal air exposure ratio is the total amount of gaps between boxes. The lesser the gaps the higher the score.\n\nCenter of gravity (CoG) refers to the CoG of all the boxes relative to the pallet. The closer it is to the bottom and middle, the higher the score.\n\n***Fitness score is a weighted score of all the scores above"
                         }
                     }
 
