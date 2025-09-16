@@ -145,6 +145,7 @@ bool ThreeDSpaceView::canGoNext() const {
 
 QVariant ThreeDSpaceView::getNewBox() {
     if (m_outputBoxes.size() == m_spawnedBoxes.size()) {
+        setAutoMode(false);
         emit navigationChanged();
         return QVariant();
     }

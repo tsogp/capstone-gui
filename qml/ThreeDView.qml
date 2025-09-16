@@ -248,21 +248,17 @@ Item {
             spacing: 10
             visible: mainWindow.hasSimulationStarted
 
-            Switch {
-                id: switchAutoMode
-                enabled: !isLoading
+            Text {
+                id: autoModeLabel
+                font.pixelSize: 16
+                color: "black"
                 Layout.alignment: Qt.AlignHCenter
-                text: checked ? "Auto-play ON" : "Auto-play OFF"
-                checked: threeDSpaceView.autoMode
-                onClicked: {
-                    threeDSpaceView.setAutoMode(checked);
-                }
+                text: threeDSpaceView.autoMode ? "Auto-play ON" : "Auto-play OFF"
             }
 
             RowLayout {
                 id: buttonLayout
                 spacing: 10
-                enabled: !threeDSpaceView.autoMode
 
                 Button {
                     id: prevStepButton
@@ -283,8 +279,18 @@ Item {
                     width: 40
                     icon.source: "qrc:/FullScreen3DView/assets/pause-24.png"
                     display: AbstractButton.IconOnly
-                    ToolTip.visible: !buttonLayout.enabled && hovered
-                    ToolTip.text: qsTr("Turn off Auto Mode to enable")
+                    visible: threeDSpaceView.autoMode
+                    onClicked: threeDSpaceView.setAutoMode(false)
+                }
+
+                Button {
+                    id: playButton
+                    height: 40
+                    width: 40
+                    icon.source: "qrc:/FullScreen3DView/assets/play-24.png"
+                    display: AbstractButton.IconOnly
+                    visible: !threeDSpaceView.autoMode
+                    onClicked: threeDSpaceView.setAutoMode(true)
                 }
 
                 Button {
