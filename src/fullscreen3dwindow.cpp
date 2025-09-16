@@ -18,7 +18,6 @@ void FullScreen3DWindow::writeSettings() {
     settings.beginGroup(WINDOW_NAME);
     settings.setValue("viewSliderFirst", m_viewSliderFirst);
     settings.setValue("viewSliderSecond", m_viewSliderSecond);
-    settings.setValue("isAutoMode", m_isAutoMode);
     settings.setValue("viewSlicingEnabled", m_viewSlicingEnabled);
     settings.endGroup();
 }
@@ -29,7 +28,6 @@ void FullScreen3DWindow::readSettings() {
     settings.beginGroup(WINDOW_NAME);
     m_viewSliderFirst = settings.value("viewSliderFirst", 0.0).toFloat();
     m_viewSliderSecond = settings.value("viewSliderSecond", 100.0).toFloat();
-    m_isAutoMode = settings.value("isAutoMode", false).toBool();
     m_viewSlicingEnabled = settings.value("viewSlicingEnabled", false).toBool();
     settings.endGroup();
 }
@@ -45,13 +43,6 @@ void FullScreen3DWindow::setViewSliderSecond(float value) {
     if (m_viewSliderSecond != value) {
         m_viewSliderSecond = value;
         emit viewSliderSecondChanged();
-    }
-}
-
-void FullScreen3DWindow::setIsAutoMode(bool value) {
-    if (m_isAutoMode != value) {
-        m_isAutoMode = value;
-        emit isAutoModeChanged();
     }
 }
 

@@ -23,6 +23,8 @@
 ThreeDSpaceView::ThreeDSpaceView(QQmlContext *contextPtr, QObject *parent) : QObject(parent) {
     contextPtr->setContextProperty("threeDSpaceView", this);
     readSettings();
+    m_autoSpawnTimer.setInterval(2000);
+    connect(&m_autoSpawnTimer, &QTimer::timeout, this, &ThreeDSpaceView::onAutoSpawnTimeout);
 }
 
 QString ThreeDSpaceView::currentModelSource() const {
@@ -43,6 +45,10 @@ QVariantList ThreeDSpaceView::getSpawnedBoxes() {
         list[i] = QVariant::fromValue(m_spawnedBoxes.at(i));
     }
     return list;
+}
+
+bool ThreeDSpaceView::autoMode() const {
+    return m_autoMode;
 }
 
 void ThreeDSpaceView::processOutputBoxesJson(const QJsonObject &response) {
@@ -110,6 +116,14 @@ void ThreeDSpaceView::select3DBox(int boxId) {
         }
     }
     qDebug() << DEBUG_PREFIX << "No box found with ID:" << boxId;
+}
+
+void ThreeDSpaceView::spawnBoxManual() {
+    emit spawnBoxRequested();
+}
+
+void ThreeDSpaceView::onAutoSpawnTimeout() {
+    emit spawnBoxRequested();
 }
 
 QVariant ThreeDSpaceView::getNewBox() {
@@ -202,6 +216,18 @@ void ThreeDSpaceView::setPalletData(const QVector3D &palletData) {
         m_palletData = palletData;
         emit palletDataChanged();
     }
+}
+
+void ThreeDSpaceView::setAutoMode(bool enabled) {
+    if (enabled) {
+        m_autoSpawnTimer.start();
+        m_autoMode = true;
+    } else {
+        m_autoSpawnTimer.stop();
+        m_autoMode = false;
+    }
+
+    emit autoModeChanged();
 }
 
 ThreeDSpaceView::~ThreeDSpaceView() {

@@ -1,6 +1,7 @@
 // ThreeDView.qml
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Layouts
 import QtQuick3D
 import QtQuick3D.Helpers
 import QtQuick3D.AssetUtils
@@ -57,6 +58,13 @@ Item {
 
         function onUpdateBoxInfo(boxInfo) {
             mainWindow.updateBoxInfo(boxInfo);
+        }
+
+        function onSpawnBoxRequested() {
+            let box = threeDSpaceView.getNewBox();
+            if (box !== null && box !== undefined) {
+                spawnBoxInQML(box.position, box.scaleFactor, box.dimensions, box.id);
+            }
         }
     }
 
@@ -222,27 +230,71 @@ Item {
             }
         }
     }
+    
+    Item {
+        width: controlLayout.implicitWidth
+        height: controlLayout.implicitHeight
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 20
+        anchors.horizontalCenter: parent.horizontalCenter
+        
+        
+        ColumnLayout {
+            id: controlLayout
+            spacing: 10
+            visible: mainWindow.hasSimulationStarted
 
-    // TODO: remove, for debugging only
-    Button {
-        id: spawnBoxButton
-        text: "Spawn Box"
-        width: 120
-        height: 40
-        anchors {
-            right: parent.right
-            bottom: parent.bottom
-            margins: 16
-        }
-        enabled: mainWindow.hasSimulationStarted
+            Switch {
+                id: switchAutoMode
+                enabled: !isLoading
+                Layout.alignment: Qt.AlignHCenter
+                text: checked ? "Auto-play ON" : "Auto-play OFF"
+                checked: threeDSpaceView.autoMode
+                onClicked: {
+                    threeDSpaceView.setAutoMode(checked);
+                }
+            }
 
-        onClicked: {
-            let box = threeDSpaceView.getNewBox();
-            if (box !== null && box !== undefined) {
-                spawnBoxInQML(box.position, box.scaleFactor, box.dimensions, box.id);
+            RowLayout {
+                id: buttonLayout
+                spacing: 10
+                enabled: !threeDSpaceView.autoMode
+
+                Button {
+                    id: prevStepButton
+                    height: 40
+                    width: 40
+                    icon.source: "qrc:/FullScreen3DView/assets/angle-double-left-24.png"
+                    display: AbstractButton.IconOnly
+                    ToolTip.visible: !buttonLayout.enabled && hovered
+                    ToolTip.text: qsTr("Turn off Auto Mode to enable")
+                }
+
+                Button {
+                    id: pauseButton
+                    height: 40
+                    width: 40
+                    icon.source: "qrc:/FullScreen3DView/assets/pause-24.png"
+                    display: AbstractButton.IconOnly
+                    ToolTip.visible: !buttonLayout.enabled && hovered
+                    ToolTip.text: qsTr("Turn off Auto Mode to enable")
+                }
+
+                Button {
+                    id: nextStepButton
+                    height: 40
+                    width: 40
+                    icon.source: "qrc:/FullScreen3DView/assets/angle-double-right-24.png"
+                    display: AbstractButton.IconOnly
+                    ToolTip.visible: !buttonLayout.enabled && hovered
+                    ToolTip.text: qsTr("Turn off Auto Mode to enable")
+
+                    onClicked: threeDSpaceView.spawnBoxManual()
+                }
             }
         }
     }
+    
 
     function moveSlicePlane(left) {
         const zMin = -(palletData.z / 2) - 2.5;

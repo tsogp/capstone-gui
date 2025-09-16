@@ -27,10 +27,6 @@ Window {
             viewSlider.second.value = settingsBridge.viewSliderSecond;
         }
 
-        function onIsAutoModeChanged() {
-            autoModeToggle.checked = settingsBridge.isAutoMode;
-        }
-
         function onViewSlicingEnabledChanged() {
             viewSlicingEnabled.checked = settingsBridge.viewSlicingEnabled;
         }
@@ -39,7 +35,6 @@ Window {
     Component.onCompleted: {
         viewSlider.first.value = settingsBridge.viewSliderFirst;
         viewSlider.second.value = settingsBridge.viewSliderSecond;
-        autoModeToggle.checked = settingsBridge.isAutoMode;
         viewSlicingEnabled.checked = settingsBridge.viewSlicingEnabled;
     }
 
@@ -179,64 +174,6 @@ Window {
         Text {
             text: qsTr("Current: %1").arg(zoomSlider.value.toFixed(2))
             font.pixelSize: 14
-        }
-    }
-
-    Switch {
-        id: autoModeToggle
-        objectName: "autoModeToggle"
-        anchors.top: zoomSliderLayout.bottom
-        anchors.left: parent.left
-        anchors.leftMargin: 15
-        anchors.topMargin: 20
-        checked: settingsBridge.isAutoMode
-        font.pointSize: 14
-        text: checked ? qsTr("Auto Mode On") : qsTr("Auto Mode Off")
-
-        onCheckedChanged: settingsBridge.isAutoMode = checked
-    }
-
-    Item {
-        width: buttonLayout.implicitWidth
-        height: buttonLayout.implicitHeight
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: 20
-        anchors.horizontalCenter: parent.horizontalCenter
-
-        RowLayout {
-            id: buttonLayout
-            spacing: 10
-            enabled: !autoModeToggle.checked
-
-            Button {
-                id: prevStepButton
-                height: 40
-                width: 40
-                icon.source: "qrc:/FullScreen3DView/assets/angle-double-left-24.png"
-                display: AbstractButton.IconOnly
-                ToolTip.visible: !buttonLayout.enabled && hovered
-                ToolTip.text: qsTr("Turn off Auto Mode to enable")
-            }
-
-            Button {
-                id: pauseButton
-                height: 40
-                width: 40
-                icon.source: "qrc:/FullScreen3DView/assets/pause-24.png"
-                display: AbstractButton.IconOnly
-                ToolTip.visible: !buttonLayout.enabled && hovered
-                ToolTip.text: qsTr("Turn off Auto Mode to enable")
-            }
-
-            Button {
-                id: nextStepButton
-                height: 40
-                width: 40
-                icon.source: "qrc:/FullScreen3DView/assets/angle-double-right-24.png"
-                display: AbstractButton.IconOnly
-                ToolTip.visible: !buttonLayout.enabled && hovered
-                ToolTip.text: qsTr("Turn off Auto Mode to enable")
-            }
         }
     }
 
