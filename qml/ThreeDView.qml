@@ -66,6 +66,10 @@ Item {
                 spawnBoxInQML(box.position, box.scaleFactor, box.dimensions, box.id);
             }
         }
+
+        function onDespawnBoxRequested() {
+            despawnNewestBox();
+        }
     }
 
     Component.onCompleted: {
@@ -264,10 +268,13 @@ Item {
                     id: prevStepButton
                     height: 40
                     width: 40
+                    enabled: threeDSpaceView.canGoPrevious
                     icon.source: "qrc:/FullScreen3DView/assets/angle-double-left-24.png"
                     display: AbstractButton.IconOnly
                     ToolTip.visible: !buttonLayout.enabled && hovered
                     ToolTip.text: qsTr("Turn off Auto Mode to enable")
+
+                    onClicked: threeDSpaceView.despawnNewestBox()
                 }
 
                 Button {
@@ -284,6 +291,7 @@ Item {
                     id: nextStepButton
                     height: 40
                     width: 40
+                    enabled: threeDSpaceView.canGoNext
                     icon.source: "qrc:/FullScreen3DView/assets/angle-double-right-24.png"
                     display: AbstractButton.IconOnly
                     ToolTip.visible: !buttonLayout.enabled && hovered
@@ -332,6 +340,14 @@ Item {
             }
         } else {
             console.error("Box component error:", component.errorString());
+        }
+    }
+
+    function despawnNewestBox() {
+        if (spawnedBoxes.length > 0) {
+            let box = spawnedBoxes.pop();
+            box.destroy();
+            console.log("Despawning box with id", box.boxId);
         }
     }
 

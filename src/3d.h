@@ -24,6 +24,9 @@ class ThreeDSpaceView : public QObject {
     Q_PROPERTY(float zoomLevel READ zoomLevel WRITE setZoomLevel NOTIFY zoomLevelChanged)
     Q_PROPERTY(QVector3D palletData READ palletData CONSTANT NOTIFY palletDataChanged)
     Q_PROPERTY(bool autoMode READ autoMode WRITE setAutoMode NOTIFY autoModeChanged)
+    Q_PROPERTY(bool canGoPrevious READ canGoPrevious NOTIFY navigationChanged)
+    Q_PROPERTY(bool canGoNext READ canGoNext NOTIFY navigationChanged)
+    
 public slots:
     QString currentModelSource() const;
     QVector2D rotationDelta() const;
@@ -39,12 +42,15 @@ public slots:
     void select3DBox(int boxId);
     bool autoMode() const;
     void onAutoSpawnTimeout();
+    bool canGoPrevious() const;
+    bool canGoNext() const;
 
 public:
     explicit ThreeDSpaceView(QQmlContext *contextPtr, QObject *parent = nullptr);
     void setOutputBoxes(const QVector<BoxData> &outputBoxes);
     Q_INVOKABLE void setAutoMode(bool enabled);
     Q_INVOKABLE void spawnBoxManual();
+    Q_INVOKABLE void despawnNewestBox();
     ~ThreeDSpaceView();
 
 signals:
@@ -56,6 +62,8 @@ signals:
     void clearBoxInfo();
     void autoModeChanged();
     void spawnBoxRequested();
+    void despawnBoxRequested();
+    void navigationChanged();
 
 private:
     QVector<BoxData> m_outputBoxes;

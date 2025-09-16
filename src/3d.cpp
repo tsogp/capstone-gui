@@ -91,6 +91,7 @@ void ThreeDSpaceView::processOutputBoxesJson(const QJsonObject &response) {
 
 void ThreeDSpaceView::setOutputBoxes(const QVector<BoxData> &boxes) {
     m_outputBoxes = boxes;
+    emit navigationChanged();
 }
 
 void ThreeDSpaceView::select3DBox(int boxId) {
@@ -122,12 +123,29 @@ void ThreeDSpaceView::spawnBoxManual() {
     emit spawnBoxRequested();
 }
 
+void ThreeDSpaceView::despawnNewestBox() {
+    if (!m_spawnedBoxes.isEmpty()) {
+        m_spawnedBoxes.pop();
+        emit despawnBoxRequested();
+        emit navigationChanged();
+    }
+}
+
 void ThreeDSpaceView::onAutoSpawnTimeout() {
     emit spawnBoxRequested();
 }
 
+bool ThreeDSpaceView::canGoPrevious() const {
+    return !m_spawnedBoxes.isEmpty();
+}
+
+bool ThreeDSpaceView::canGoNext() const {
+    return !m_outputBoxes.isEmpty() && m_outputBoxes.size() > m_spawnedBoxes.size();
+}
+
 QVariant ThreeDSpaceView::getNewBox() {
     if (m_outputBoxes.size() == m_spawnedBoxes.size()) {
+        emit navigationChanged();
         return QVariant();
     }
     qDebug() << m_outputBoxes.size() << ' ' << m_spawnedBoxes.size() << '\n';
@@ -162,6 +180,10 @@ QVariant ThreeDSpaceView::getNewBox() {
                                 jsonBox.dimensions()
                             );
     m_spawnedBoxes.push(newBox);
+
+    if (m_spawnedBoxes.size() == 1) {
+        emit navigationChanged();
+    }
     
     return QVariant::fromValue(newBox);;
 }
