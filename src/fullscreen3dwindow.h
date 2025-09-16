@@ -14,7 +14,6 @@ class FullScreen3DWindow : public QObject {
     Q_PROPERTY(float viewSliderFirst READ viewSliderFirst WRITE setViewSliderFirst NOTIFY viewSliderFirstChanged FINAL)
     Q_PROPERTY(
         float viewSliderSecond READ viewSliderSecond WRITE setViewSliderSecond NOTIFY viewSliderSecondChanged FINAL)
-    Q_PROPERTY(bool isAutoMode READ isAutoMode WRITE setIsAutoMode NOTIFY isAutoModeChanged FINAL)
     Q_PROPERTY(bool viewSlicingEnabled READ viewSlicingEnabled WRITE setViewSlicingEnabled NOTIFY
                    viewSlicingEnabledChanged FINAL)
 public:
@@ -30,11 +29,6 @@ public:
         return m_viewSliderSecond;
     }
     void setViewSliderSecond(float value);
-
-    bool isAutoMode() const {
-        return m_isAutoMode;
-    }
-    void setIsAutoMode(bool value);
 
     bool viewSlicingEnabled() const {
         return m_viewSlicingEnabled;
@@ -54,7 +48,6 @@ signals:
 
     void viewSliderFirstChanged();
     void viewSliderSecondChanged();
-    void isAutoModeChanged();
     void viewSlicingEnabledChanged();
 
 private:
@@ -65,7 +58,6 @@ private:
 
     float m_viewSliderFirst = 0;
     float m_viewSliderSecond = 100;
-    bool m_isAutoMode = false;
     bool m_viewSlicingEnabled = false;
 
     void writeSettings();

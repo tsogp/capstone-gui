@@ -18,6 +18,8 @@ qt_add_executable(appFullScreen3DView
     src/mainwindow.cpp
     src/3d.cpp
     src/boxdata.cpp
+        src/networkhelper.cpp
+        src/networkhelper.h
 )
 
 file(GLOB_RECURSE ASSET_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} CONFIGURE_DEPENDS assets/*)
@@ -30,6 +32,7 @@ qt_add_qml_module(appFullScreen3DView
     qml/Mainscreen.qml
     qml/ThreeDView.qml
     qml/PreviewWindow.qml
+    qml/AddBoxesForSessionDialog.qml
     RESOURCES
     ${ASSET_FILES}
     data/pallet.json

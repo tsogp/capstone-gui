@@ -1,6 +1,7 @@
 // ThreeDView.qml
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Layouts
 import QtQuick3D
 import QtQuick3D.Helpers
 import QtQuick3D.AssetUtils
@@ -57,6 +58,17 @@ Item {
 
         function onUpdateBoxInfo(boxInfo) {
             mainWindow.updateBoxInfo(boxInfo);
+        }
+
+        function onSpawnBoxRequested() {
+            let box = threeDSpaceView.getNewBox();
+            if (box !== null && box !== undefined) {
+                spawnBoxInQML(box.position, box.scaleFactor, box.dimensions, box.id);
+            }
+        }
+
+        function onDespawnBoxRequested() {
+            despawnNewestBox();
         }
     }
 
@@ -174,8 +186,8 @@ Item {
                 asynchronous: true
 
                 onLoaded: {
-                    item.position = Qt.vector3d(0, 0, 0);
-                    item.scale = Qt.vector3d(1.5, 1.5, 1.5);
+                    item.position.x = 0;
+                    item.position.z = 0;
                 }
             }
 
@@ -222,31 +234,85 @@ Item {
             }
         }
     }
+    
+    Item {
+        width: controlLayout.implicitWidth
+        height: controlLayout.implicitHeight
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 20
+        anchors.horizontalCenter: parent.horizontalCenter
+        
+        
+        ColumnLayout {
+            id: controlLayout
+            spacing: 10
+            visible: mainWindow.hasSimulationStarted
 
-    // TODO: remove, for debugging only
-    Button {
-        id: spawnBoxButton
-        text: "Spawn Box"
-        width: 120
-        height: 40
-        anchors {
-            right: parent.right
-            bottom: parent.bottom
-            margins: 16
-        }
-        enabled: mainWindow.hasSimulationStarted
+            Text {
+                id: autoModeLabel
+                font.pixelSize: 16
+                color: "black"
+                Layout.alignment: Qt.AlignHCenter
+                text: threeDSpaceView.autoMode ? "Auto-play ON" : "Auto-play OFF"
+            }
 
-        onClicked: {
-            let box = threeDSpaceView.getNewBox();
-            if (box !== null && box !== undefined) {
-                spawnBoxInQML(box.position, box.scaleFactor, box.dimensions, box.id);
+            RowLayout {
+                id: buttonLayout
+                spacing: 10
+
+                Button {
+                    id: prevStepButton
+                    height: 40
+                    width: 40
+                    enabled: threeDSpaceView.canGoPrevious
+                    icon.source: "qrc:/FullScreen3DView/assets/angle-double-left-24.png"
+                    display: AbstractButton.IconOnly
+                    ToolTip.visible: !buttonLayout.enabled && hovered
+                    ToolTip.text: qsTr("Turn off Auto Mode to enable")
+
+                    onClicked: threeDSpaceView.despawnNewestBox()
+                }
+
+                Button {
+                    id: pauseButton
+                    height: 40
+                    width: 40
+                    icon.source: "qrc:/FullScreen3DView/assets/pause-24.png"
+                    display: AbstractButton.IconOnly
+                    visible: threeDSpaceView.autoMode
+                    onClicked: threeDSpaceView.setAutoMode(false)
+                }
+
+                Button {
+                    id: playButton
+                    height: 40
+                    width: 40
+                    icon.source: "qrc:/FullScreen3DView/assets/play-24.png"
+                    display: AbstractButton.IconOnly
+                    visible: !threeDSpaceView.autoMode
+                    onClicked: threeDSpaceView.setAutoMode(true)
+                }
+
+                Button {
+                    id: nextStepButton
+                    height: 40
+                    width: 40
+                    enabled: threeDSpaceView.canGoNext
+                    icon.source: "qrc:/FullScreen3DView/assets/angle-double-right-24.png"
+                    display: AbstractButton.IconOnly
+                    ToolTip.visible: !buttonLayout.enabled && hovered
+                    ToolTip.text: qsTr("Turn off Auto Mode to enable")
+
+                    onClicked: threeDSpaceView.spawnBoxManual()
+                }
             }
         }
     }
+    
 
     function moveSlicePlane(left) {
-        const zMin = -(palletData.z / 2);
-        const zMax = (palletData.z / 2);
+        const zMin = -(palletData.z / 2) - 2.5;
+        const zMax = (palletData.z / 2) + 2.5;
 
         if (left) {
             leftPlane.position.z = zMin + (zMax - zMin) * (slideLeft / 100);
@@ -283,18 +349,28 @@ Item {
         }
     }
 
+    function despawnNewestBox() {
+        if (spawnedBoxes.length > 0) {
+            let box = spawnedBoxes.pop();
+            box.destroy();
+            console.log("Despawning box with id", box.boxId);
+        }
+    }
+
     function checkCollisions() {
         function checkBoxPlaneCollision(planeZ, box, positiveDirection) {
-            const halfDepth = box.dimensions.z * box.scale.z * 0.5;
+            const depth = box.dimensions.z * box.scale.z;
+
+            console.log(depth, box.position, box.dimensions, box.scale, box.position.z - depth, planeZ);
 
             // Checking if left plane has touched the left side of the box
             if (positiveDirection) {
-                const boxMinZ = box.position.z - halfDepth;
+                const boxMinZ = box.position.z - depth;
                 return planeZ >= boxMinZ;
             }
 
             // Checking if right plane has touched the right side of the box
-            const boxMaxZ = box.position.z + halfDepth;
+            const boxMaxZ = box.position.z + depth;
             return planeZ <= boxMaxZ;
         }
 
